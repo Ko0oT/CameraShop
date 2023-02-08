@@ -2,7 +2,11 @@ import React from 'react';
 import Banner from '../../components/banner/banner';
 import Footer from '../../components/footer/footer';
 import Header from '../../components/header/header';
+import Pagination from '../../components/pagination/pagination';
 import ProductCard from '../../components/product-card/product-card';
+import { PRODUCTS_PER_PAGE } from '../../constants';
+import { useAppSelector } from '../../hooks';
+import { getCurrentPage } from '../../store/app-process/app-process-selectors';
 import { Product } from '../../types/types';
 
 const cameras: Product[] = [
@@ -649,6 +653,13 @@ const cameras: Product[] = [
 ];
 
 function Catalog() {
+
+  const currentPage = useAppSelector(getCurrentPage);
+  const lastProductIndex = currentPage * PRODUCTS_PER_PAGE;
+  const firstProductIndex = lastProductIndex - PRODUCTS_PER_PAGE;
+  const currentProducts = cameras.slice(firstProductIndex, lastProductIndex);
+
+
   return (
     <div className="wrapper">
       <Header />
@@ -858,38 +869,9 @@ function Catalog() {
                     </form>
                   </div>
                   <div className="cards catalog__cards">
-                    {cameras.map((it) => <ProductCard data={it} key={it.id}/>)}
+                    {currentProducts.map((it) => <ProductCard data={it} key={it.id}/>)}
                   </div>
-                  <div className="pagination">
-                    <ul className="pagination__list">
-                      <li className="pagination__item">
-                        <a
-                          className="pagination__link pagination__link--active"
-                          href={'1'}
-                        >
-                      1
-                        </a>
-                      </li>
-                      <li className="pagination__item">
-                        <a className="pagination__link" href={'2'}>
-                      2
-                        </a>
-                      </li>
-                      <li className="pagination__item">
-                        <a className="pagination__link" href={'3'}>
-                      3
-                        </a>
-                      </li>
-                      <li className="pagination__item">
-                        <a
-                          className="pagination__link pagination__link--text"
-                          href={'2'}
-                        >
-                      Далее
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
+                  <Pagination data={cameras}/>
                 </div>
               </div>
             </div>
