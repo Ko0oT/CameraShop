@@ -1,6 +1,8 @@
 export const AppRoute = {
-  Catalog: '/',
-  Cameras: '/cameras',
+  Root: '/',
+  Product: '/product',
+  Basket: '/basket',
+  NotFound: '/not_found'
 } as const;
 
 export const NameSpace = {

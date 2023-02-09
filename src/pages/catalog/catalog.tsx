@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Banner from '../../components/banner/banner';
 import Pagination from '../../components/pagination/pagination';
 import ProductCard from '../../components/product-card/product-card';
-import { PRODUCTS_PER_PAGE } from '../../constants';
+import { AppRoute, PRODUCTS_PER_PAGE } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getCurrentPage } from '../../store/app-process/app-process-selectors';
 import { Product } from '../../types/types';
@@ -10,6 +10,7 @@ import { resetPage, setCurrentPage } from '../../store/app-process/app-process-s
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getPageNumbers } from '../../utils';
 import { Helmet } from 'react-helmet-async';
+import ProductPreview from '../../components/product-preview/product-preview';
 
 
 const cameras: Product[] = [
@@ -660,6 +661,7 @@ function Catalog() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+
   const {pageId} = useParams();
 
   const pagesCount = Math.ceil(cameras.length / PRODUCTS_PER_PAGE);
@@ -671,7 +673,7 @@ function Catalog() {
     }
 
     if (pageId && !pageNumbers.includes(Number(pageId))) {
-      navigate('/404');
+      navigate(AppRoute.NotFound);
     }
   }, [pageId, pageNumbers, navigate, dispatch]);
 
@@ -680,6 +682,19 @@ function Catalog() {
   const lastProductIndex = currentPage * PRODUCTS_PER_PAGE;
   const firstProductIndex = lastProductIndex - PRODUCTS_PER_PAGE;
   const currentProducts = cameras.slice(firstProductIndex, lastProductIndex);
+
+
+  const [modalIsActive, setModalActive] = useState<boolean>(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product>({} as Product);
+
+  const handleBuyButtonClick = (data: Product) => {
+    setModalActive(true);
+    setSelectedProduct(data);
+  };
+
+  const handleCloseButtonClick = () => {
+    setModalActive(false);
+  };
 
 
   return (
@@ -693,7 +708,7 @@ function Catalog() {
           <div className="container">
             <ul className="breadcrumbs__list">
               <li className="breadcrumbs__item">
-                <Link className="breadcrumbs__link" to="/" onClick={() => dispatch(resetPage())}>
+                <Link className="breadcrumbs__link" to={AppRoute.Root} onClick={() => dispatch(resetPage())}>
                 Главная
                   <svg width={5} height={8} aria-hidden="true">
                     <use xlinkHref="#icon-arrow-mini" />
@@ -895,7 +910,7 @@ function Catalog() {
                   ?
                   <>
                     <div className="cards catalog__cards">
-                      {currentProducts.map((it) => <ProductCard data={it} key={it.id}/>)}
+                      {currentProducts.map((it) => <ProductCard data={it} key={it.id} handleBuyButtonClick={handleBuyButtonClick}/>)}
                     </div>
                     <Pagination pagesCount={pagesCount} pageNumbers={pageNumbers}/>
                   </>
@@ -906,6 +921,7 @@ function Catalog() {
           </div>
         </section>
       </div>
+      <ProductPreview data={selectedProduct} isActive={modalIsActive} handleCloseButtonClick={handleCloseButtonClick}/>
     </>
   );
 }

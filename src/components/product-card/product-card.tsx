@@ -1,5 +1,7 @@
 import React from 'react';
 import { Product } from '../../types/types';
+import { Link } from 'react-router-dom';
+import { AppRoute } from '../../constants';
 
 const isInTheBasket = false;
 
@@ -15,9 +17,10 @@ const EmptyStarIcon = () => (
 
 type ProductCardProps = {
   data: Product;
+  handleBuyButtonClick: (data: Product) => void;
 }
 
-function ProductCard({data}: ProductCardProps) {
+function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
   return (
     <div className="product-card">
       <div className="product-card__img">
@@ -45,7 +48,7 @@ function ProductCard({data}: ProductCardProps) {
           </p>
         </div>
         <p className="product-card__title">
-          {data.name}
+          {data.category} {data.name}
         </p>
         <p className="product-card__price">
           <span className="visually-hidden">Цена:</span>{data.price} ₽
@@ -67,12 +70,13 @@ function ProductCard({data}: ProductCardProps) {
           <button
             className="btn btn--purple product-card__btn"
             type="button"
+            onClick={() => handleBuyButtonClick(data)}
           >
             Купить
           </button>}
-        <a className="btn btn--transparent" href="#">
+        <Link className="btn btn--transparent" to={`${AppRoute.Product}/${data.id}`}>
           Подробнее
-        </a>
+        </Link>
       </div>
     </div>
   );

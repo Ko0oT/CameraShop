@@ -1,6 +1,6 @@
 import React from 'react';
-// import { Link } from 'react-router-dom';
-// import { AppRoute } from '../../constants';
+import { Link } from 'react-router-dom';
+import { AppRoute } from '../../constants';
 
 const data = {
   id: 1,
@@ -17,13 +17,10 @@ function Banner() {
       <picture>
         <source
           type="image/webp"
-          // srcSet="img/content/banner-bg.webp, img/content/banner-bg@2x.webp 2x"
           srcSet={`${data.previewImgWebp}, ${data.previewImgWebp2x} 2x`}
         />
         <img
-          // src="img/content/banner-bg.jpg"
           src={`${data.previewImg}`}
-          // srcSet="img/content/banner-bg@2x.jpg 2x"
           srcSet={`${data.previewImg2x} 2x`}
           width={1280}
           height={280}
@@ -38,9 +35,9 @@ function Banner() {
         <span className="banner__text">
     Профессиональная камера от&nbsp;известного производителя
         </span>
-        {/* <Link className="btn" to={`${AppRoute.Cameras}/${data.id}`}>
+        <Link className="btn" to={`${AppRoute.Product}/${data.id}`}>
     Подробнее
-        </Link> */}
+        </Link>
       </p>
     </div>
   );
