@@ -1,8 +1,12 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 
 function Product() {
   return (
     <>
+      <Helmet>
+        <title>Продукт - Фотошоп</title>
+      </Helmet>
       <div className="page-content">
         <div className="breadcrumbs">
           <div className="container">

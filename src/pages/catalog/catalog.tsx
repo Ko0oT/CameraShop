@@ -9,6 +9,7 @@ import { Product } from '../../types/types';
 import { resetPage, setCurrentPage } from '../../store/app-process/app-process-slice';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getPageNumbers } from '../../utils';
+import { Helmet } from 'react-helmet-async';
 
 
 const cameras: Product[] = [
@@ -683,6 +684,9 @@ function Catalog() {
 
   return (
     <>
+      <Helmet>
+        <title>Каталог - Фотошоп</title>
+      </Helmet>
       <Banner />
       <div className="page-content">
         <div className="breadcrumbs">
@@ -887,7 +891,7 @@ function Catalog() {
                     </div>
                   </form>
                 </div>
-                {currentProducts.length > 1
+                {currentProducts.length >= 1
                   ?
                   <>
                     <div className="cards catalog__cards">

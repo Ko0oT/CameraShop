@@ -1,4 +1,4 @@
-// import { Helmet } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 
 function NotFound() {
@@ -8,9 +8,9 @@ function NotFound() {
 
   return (
     <>
-      {/* <Helmet>
-        <title>Страница не найдена</title>
-      </Helmet> */}
+      <Helmet>
+        <title>Страница не найдена - Фотошоп</title>
+      </Helmet>
       <h1 style={style}>404 Not Found</h1>
       <Link className='breadcrumbs__link' style={style} to='/'>Вернуться на главную</Link>
     </>
