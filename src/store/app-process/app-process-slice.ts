@@ -15,14 +15,8 @@ export const appProcess = createSlice({
     resetPage: (state) => {
       state.currentPage = 1;
     },
-    setNextPage: (state) => {
-      state.currentPage = state.currentPage + 1;
-    },
-    setPreviousPage: (state) => {
-      state.currentPage = state.currentPage - 1;
-    }
   }
 });
 
-export const { setCurrentPage, resetPage, setNextPage, setPreviousPage } = appProcess.actions;
+export const { setCurrentPage, resetPage } = appProcess.actions;
 

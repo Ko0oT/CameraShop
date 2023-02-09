@@ -3,12 +3,12 @@ import { Product } from '../../types/types';
 
 const isInTheBasket = false;
 
-const fullStarIcon = (
+const FullStarIcon = () => (
   <svg width={17} height={16} aria-hidden="true">
     <use xlinkHref="#icon-full-star" />
   </svg>);
 
-const emptyStarIcon = (
+const EmptyStarIcon = () => (
   <svg width={17} height={16} aria-hidden="true">
     <use xlinkHref="#icon-star" />
   </svg>);
@@ -37,8 +37,8 @@ function ProductCard({data}: ProductCardProps) {
       </div>
       <div className="product-card__info">
         <div className="rate product-card__rate">
-          {Array.from({length: data.rating}).map(() => fullStarIcon)}
-          {Array.from({length: 5 - data.rating}).map(() => emptyStarIcon)}
+          {Array.from({length: data.rating}, (_, i) => i).map((it) => <FullStarIcon key={it}/>)}
+          {Array.from({length: 5 - data.rating}, (_, i) => i).map((it) => <EmptyStarIcon key={it}/>)}
           <p className="visually-hidden">Рейтинг: {data.rating}</p>
           <p className="rate__count">
             <span className="visually-hidden">Всего оценок:</span>{data.reviewCount}

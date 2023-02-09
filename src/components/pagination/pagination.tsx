@@ -1,39 +1,16 @@
 import React from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks';
-import { setNextPage, setPreviousPage, setCurrentPage } from '../../store/app-process/app-process-slice';
-import { Product } from '../../types/types';
+import { useAppSelector } from '../../hooks';
 import { Link } from 'react-router-dom';
 import { getCurrentPage } from '../../store/app-process/app-process-selectors';
-import { PRODUCTS_PER_PAGE } from '../../constants';
 
 type PaginationProps = {
-  data: Product[];
+  pagesCount: number;
+  pageNumbers: number[];
 }
 
+function Pagination({pagesCount, pageNumbers}: PaginationProps) {
 
-function Pagination({data}: PaginationProps) {
-
-  const dispatch = useAppDispatch();
   const currentPage = useAppSelector(getCurrentPage);
-
-  function handlePaginationClick (pageNumber: number) {
-    dispatch(setCurrentPage(pageNumber));
-  }
-
-  function handleBackClick () {
-    dispatch(setPreviousPage());
-  }
-
-  function handleNextClick () {
-    dispatch(setNextPage());
-  }
-
-  const pagesCount = Math.ceil(data.length / PRODUCTS_PER_PAGE);
-  const pageNumbers: number[] = [];
-
-  for (let i = 1; i <= pagesCount; i++) {
-    pageNumbers.push(i);
-  }
 
   if (pagesCount <= 1) {
     return null;
@@ -47,8 +24,7 @@ function Pagination({data}: PaginationProps) {
           <li className="pagination__item">
             <Link
               className="pagination__link pagination__link--text"
-              to={`${currentPage - 1}`}
-              onClick={handleBackClick}
+              to={`/${currentPage - 1}`}
             >
               Назад
             </Link>
@@ -62,8 +38,7 @@ function Pagination({data}: PaginationProps) {
           >
             <Link
               className={`pagination__link ${it === currentPage ? 'pagination__link--active' : ''}`}
-              to={`${it}`}
-              onClick={() => handlePaginationClick(it)}
+              to={`/${it}`}
             >
               {it}
             </Link>
@@ -75,8 +50,7 @@ function Pagination({data}: PaginationProps) {
           <li className="pagination__item">
             <Link
               className="pagination__link pagination__link--text"
-              to={`${currentPage + 1}`}
-              onClick={handleNextClick}
+              to={`/${currentPage + 1}`}
             >
             Далее
             </Link>
