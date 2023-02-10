@@ -2,27 +2,19 @@ import React from 'react';
 import { Product } from '../../types/types';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../constants';
+import StarsRating from '../stars-rating/stars-rating';
 
 const isInTheBasket = false;
-
-const FullStarIcon = () => (
-  <svg width={17} height={16} aria-hidden="true">
-    <use xlinkHref="#icon-full-star" />
-  </svg>);
-
-const EmptyStarIcon = () => (
-  <svg width={17} height={16} aria-hidden="true">
-    <use xlinkHref="#icon-star" />
-  </svg>);
 
 type ProductCardProps = {
   data: Product;
   handleBuyButtonClick: (data: Product) => void;
+  isActive?: boolean;
 }
 
-function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
+function ProductCard({data, handleBuyButtonClick, isActive}: ProductCardProps) {
   return (
-    <div className="product-card">
+    <div className={`product-card ${isActive ? 'is-active' : ''}`}>
       <div className="product-card__img">
         <picture>
           <source
@@ -40,8 +32,7 @@ function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
       </div>
       <div className="product-card__info">
         <div className="rate product-card__rate">
-          {Array.from({length: data.rating}, (_, i) => i).map((it) => <FullStarIcon key={it}/>)}
-          {Array.from({length: 5 - data.rating}, (_, i) => i).map((it) => <EmptyStarIcon key={it}/>)}
+          <StarsRating rating={data.rating}/>
           <p className="visually-hidden">Рейтинг: {data.rating}</p>
           <p className="rate__count">
             <span className="visually-hidden">Всего оценок:</span>{data.reviewCount}

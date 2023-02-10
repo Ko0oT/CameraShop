@@ -10,3 +10,5 @@ export const NameSpace = {
 } as const;
 
 export const PRODUCTS_PER_PAGE = 9;
+
+export const PRODUCTS_PER_SLIDER = 3;

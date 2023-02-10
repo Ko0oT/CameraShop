@@ -1,35 +1,216 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
+import ProductCard from '../../components/product-card/product-card';
+import StarsRating from '../../components/stars-rating/stars-rating';
+import { AppRoute } from '../../constants';
+import { Product as ProductType } from '../../types/types';
+// import { getPageNumbers } from '../../utils';
+
+const data: ProductType = {
+  id: 1,
+  name: 'Ретрокамера Dus Auge lV',
+  vendorCode: 'DA4IU67AD5',
+  type: 'Коллекционная',
+  category: 'Видеокамера',
+  description: 'Немецкий концерн BRW разработал видеокамеру Das Auge IV в начале 80-х годов, однако она до сих пор пользуется популярностью среди коллекционеров и яростных почитателей старинной техники. Вы тоже можете прикоснуться к волшебству аналоговой съёмки, заказав этот чудо-аппарат. Кто знает, может с Das Auge IV начнётся ваш путь к наградам всех престижных кинофестивалей.',
+  previewImg: 'img/content/das-auge.jpg',
+  level: 'Любительский',
+  rating: 4,
+  price: 73450,
+  previewImg2x: 'img/content/das-auge@2x.jpg',
+  previewImgWebp: 'img/content/das-auge.webp',
+  previewImgWebp2x: 'img/content/das-auge@2x.webp',
+  reviewCount: 10
+};
+
+const similar: ProductType[] = [
+  {
+    id: 5,
+    name: 'Van Shot',
+    vendorCode: 'YU7RT5GH76',
+    type: 'Коллекционная',
+    category: 'Видеокамера',
+    description: 'Крайне редкое наименование не потеряло актуальность не смотря на сможество альтернатив. После съёмок на данную камеру фильм не стыдно показать в рамках кинофестиваля. Первые 4К настройки, высочайшее разрешение, уникальная цветопередача.',
+    previewImg: 'img/content/van-shot.jpg',
+    level: 'Профессиональный',
+    rating: 5,
+    price: 149990,
+    previewImg2x: 'img/content/van-shot@2x.jpg',
+    previewImgWebp: 'img/content/van-shot.webp',
+    previewImgWebp2x: 'img/content/van-shot@2x.webp',
+    reviewCount: 16
+  },
+  {
+    id: 11,
+    name: 'SP 520',
+    vendorCode: 'JQ756',
+    type: 'Коллекционная',
+    category: 'Видеокамера',
+    description: 'Делайте лучшие фильмы в высоком разрешении. Лёгкая в управлении, мощная начинка, реалистичная цветопередача, возможность просмотра отснятого материала через поворотный ЖК-экран и передача видео через систему Bluetooth.',
+    previewImg: 'img/content/sp-520.jpg',
+    level: 'Профессиональный',
+    rating: 5,
+    price: 105590,
+    previewImg2x: 'img/content/sp-520@2x.jpg',
+    previewImgWebp: 'img/content/sp-520.webp',
+    previewImgWebp2x: 'img/content/sp-520@2x.webp',
+    reviewCount: 14
+  },
+  {
+    id: 33,
+    name: 'Amazing Go',
+    vendorCode: 'AD345J',
+    type: 'Коллекционная',
+    category: 'Видеокамера',
+    description: 'Прикрепить камеру на шлем, сделать множество крутых видео под водой или записать свой полёт на тарзанке - благодаря усовершенствованной камере семейства Go ваши приключения останутся навсегда в памяти.',
+    previewImg: 'img/content/amazing-go.jpg',
+    level: 'Профессиональный',
+    rating: 4,
+    price: 79000,
+    previewImg2x: 'img/content/amazing-go@2x.jpg',
+    previewImgWebp: 'img/content/amazing-go.webp',
+    previewImgWebp2x: 'img/content/amazing-go@2x.webp',
+    reviewCount: 14
+  },
+  {
+    id: 17,
+    name: 'Look Identify',
+    vendorCode: 'LD2000',
+    type: 'Коллекционная',
+    category: 'Фотоаппарат',
+    description: 'Среднеформатная 40-мегапиксельная камера обладет уникальным непоторимым дизайном и ручной росписью корпуса. Ориентирована на студийную съёмку, имеет полный кадр --  35-мм сенсор ',
+    previewImg: 'img/content/look-identify.jpg',
+    level: 'Любительский',
+    rating: 5,
+    price: 126000,
+    previewImg2x: 'img/content/look-identify@2x.jpg',
+    previewImgWebp: 'img/content/look-identify.webp',
+    previewImgWebp2x: 'img/content/look-identify@2x.webp',
+    reviewCount: 0
+  },
+  {
+    id: 12,
+    name: 'Look Shot',
+    vendorCode: 'NB569SH',
+    type: 'Цифровая',
+    category: 'Видеокамера',
+    description: 'Гибридный автофокус и динамический стабилизатор по приятной цене. Светочувствительная матрица  без шумов. 8-кратный выездной зум в стильной упаковке.',
+    previewImg: 'img/content/look-shot.jpg',
+    level: 'Любительский',
+    rating: 4,
+    price: 18590,
+    previewImg2x: 'img/content/look-shot@2x.jpg',
+    previewImgWebp: 'img/content/look-shot.webp',
+    previewImgWebp2x: 'img/content/look-shot@2x.webp',
+    reviewCount: 14
+  },
+  {
+    id: 19,
+    name: 'Pro Look 4',
+    vendorCode: 'PL4CD',
+    type: 'Цифровая',
+    category: 'Видеокамера',
+    description: 'Камера для любителей запечатлеть каждый момент жизни! Слот для SD-карты и возможность смотреть свои записи сразу на TV.',
+    previewImg: 'img/content/pro-look-4.jpg',
+    level: 'Любительский',
+    rating: 5,
+    price: 34590,
+    previewImg2x: 'img/content/pro-look-4@2x.jpg',
+    previewImgWebp: 'img/content/pro-look-4.webp',
+    previewImgWebp2x: 'img/content/pro-look-4@2x.webp',
+    reviewCount: 3
+  },
+  {
+    id: 20,
+    name: 'Pro Look 56F',
+    vendorCode: 'PL67T56F',
+    type: 'Цифровая',
+    category: 'Видеокамера',
+    description: '6-кратный зум, чтобы выделить важные подробности. Простые настройки, ЖК-экран, лёгко помещается в руке - всегда можно брать с собой, Li-Ion аккамулятор.',
+    previewImg: 'img/content/pro-look-56f.jpg',
+    level: 'Любительский',
+    rating: 3,
+    price: 27990,
+    previewImg2x: 'img/content/pro-look-56f@2x.jpg',
+    previewImgWebp: 'img/content/pro-look-56f.webp',
+    previewImgWebp2x: 'img/content/pro-look-56f@2x.webp',
+    reviewCount: 10
+  },
+  {
+    id: 26,
+    name: 'GQ Lite',
+    vendorCode: 'GO89L',
+    type: 'Цифровая',
+    category: 'Видеокамера',
+    description: 'Небольшая, лёгкая камера с функционалом для начинающего режиссёра. Многократный зум, отличная матрица, усовершенствованный стабилизатор, возможность съёмки по принципц го-про. Для данной камеры можно приобрести водоатталкивающий чехол. а в комплекте штатив. ',
+    previewImg: 'img/content/gq-lite.jpg',
+    level: 'Любительский',
+    rating: 5,
+    price: 71900,
+    previewImg2x: 'img/content/gq-lite@2x.jpg',
+    previewImgWebp: 'img/content/gq-lite.webp',
+    previewImgWebp2x: 'img/content/gq-lite@2x.webp',
+    reviewCount: 8
+  },
+  {
+    id: 27,
+    name: 'Life Pro',
+    vendorCode: 'PH67F9R',
+    type: 'Коллекционная',
+    category: 'Фотоаппарат',
+    description: 'Фотокамера премиум класса, позволяет зависывать видео в качестве 4К, обладет 53-кратным зумом, поворотный ЖК-экран, улучшенная матрица, мощный процессор. Линейка выпущена в ограниченном количестве, даже без дополнительного объектива позволит создавать великолепный фотографии за один миг.',
+    previewImg: 'img/content/life-pro.jpg',
+    level: 'Профессиональный',
+    rating: 5,
+    price: 199000,
+    previewImg2x: 'img/content/life-pro@2x.jpg',
+    previewImgWebp: 'img/content/life-pro.webp',
+    previewImgWebp2x: 'img/content/life-pro@2x.webp',
+    reviewCount: 10
+  }
+];
 
 function Product() {
+
+  const [descriptionTabIsActive, setDescriptionTabIsActive] = useState<boolean>(true);
+
+  // const pagesCount = Math.ceil(similar.length / PRODUCTS_PER_SLIDER);//2
+  // const pageNumbers: number[] = useMemo(() => getPageNumbers(pagesCount),[pagesCount]); //[1,2]
+
+  //[0, 1, 2, 3, 4, 5]
+  // const [modalIsActive, setModalActive] = useState<boolean>(false);
+  //TODO: показать модальное окно.
+  const handleBuyButtonClick = () => null;
+
   return (
     <>
       <Helmet>
-        <title>Продукт - Фотошоп</title>
+        <title>{data.name}</title>
       </Helmet>
       <div className="page-content">
         <div className="breadcrumbs">
           <div className="container">
             <ul className="breadcrumbs__list">
               <li className="breadcrumbs__item">
-                <a className="breadcrumbs__link" href="index.html">
+                <Link className="breadcrumbs__link" to={AppRoute.Root}>
                 Главная
                   <svg width={5} height={8} aria-hidden="true">
                     <use xlinkHref="#icon-arrow-mini" />
                   </svg>
-                </a>
+                </Link>
               </li>
               <li className="breadcrumbs__item">
-                <a className="breadcrumbs__link" href="catalog.html">
+                <Link className="breadcrumbs__link" to={AppRoute.Root}>
                 Каталог
                   <svg width={5} height={8} aria-hidden="true">
                     <use xlinkHref="#icon-arrow-mini" />
                   </svg>
-                </a>
+                </Link>
               </li>
               <li className="breadcrumbs__item">
                 <span className="breadcrumbs__link breadcrumbs__link--active">
-                Ретрокамера «Das Auge IV»
+                  {data.name}
                 </span>
               </li>
             </ul>
@@ -42,92 +223,79 @@ function Product() {
                 <picture>
                   <source
                     type="image/webp"
-                    srcSet="img/content/img1.webp, img/content/img1@2x.webp 2x"
+                    srcSet={`${data.previewImgWebp}, ${data.previewImgWebp2x} 2x`}
                   />
                   <img
-                    src="img/content/img1.jpg"
-                    srcSet="img/content/img1@2x.jpg 2x"
+                    src={data.previewImg}
+                    srcSet={`${data.previewImg2x} 2x`}
                     width={560}
                     height={480}
-                    alt="Ретрокамера Das Auge IV"
+                    alt={data.name}
                   />
                 </picture>
               </div>
               <div className="product__content">
-                <h1 className="title title--h3">Ретрокамера «Das Auge IV»</h1>
+                <h1 className="title title--h3">{data.name}</h1>
                 <div className="rate product__rate">
-                  <svg width={17} height={16} aria-hidden="true">
-                    <use xlinkHref="#icon-full-star" />
-                  </svg>
-                  <svg width={17} height={16} aria-hidden="true">
-                    <use xlinkHref="#icon-full-star" />
-                  </svg>
-                  <svg width={17} height={16} aria-hidden="true">
-                    <use xlinkHref="#icon-full-star" />
-                  </svg>
-                  <svg width={17} height={16} aria-hidden="true">
-                    <use xlinkHref="#icon-full-star" />
-                  </svg>
-                  <svg width={17} height={16} aria-hidden="true">
-                    <use xlinkHref="#icon-star" />
-                  </svg>
-                  <p className="visually-hidden">Рейтинг: 4</p>
+                  <StarsRating rating={data.rating}/>
+                  <p className="visually-hidden">Рейтинг: {data.rating}</p>
                   <p className="rate__count">
-                    <span className="visually-hidden">Всего оценок:</span>12
+                    <span className="visually-hidden">Всего оценок:</span>{data.reviewCount}
                   </p>
                 </div>
                 <p className="product__price">
-                  <span className="visually-hidden">Цена:</span>73 450 ₽
+                  <span className="visually-hidden">Цена:</span>{data.price} ₽
                 </p>
+
+                {/* TODO добавить хендлер */}
                 <button className="btn btn--purple" type="button">
                   <svg width={24} height={16} aria-hidden="true">
                     <use xlinkHref="#icon-add-basket" />
                   </svg>
                 Добавить в корзину
                 </button>
+
+                {/* При выборе продукта каждая вкладка — таб имеет свой уникальный URL с сохранением текстовой информации. */}
                 <div className="tabs product__tabs">
                   <div className="tabs__controls product__tabs-controls">
-                    <button className="tabs__control" type="button">
+                    <button
+                      className={`tabs__control ${!descriptionTabIsActive ? 'is-active' : ''}`} type="button"
+                      onClick={() => setDescriptionTabIsActive(false)}
+                    >
                     Характеристики
                     </button>
-                    <button className="tabs__control is-active" type="button">
+                    <button
+                      className={`tabs__control ${descriptionTabIsActive ? 'is-active' : ''}`} type="button"
+                      onClick={() => setDescriptionTabIsActive(true)}
+                    >
                     Описание
                     </button>
                   </div>
                   <div className="tabs__content">
-                    <div className="tabs__element">
+                    <div className={`tabs__element ${!descriptionTabIsActive ? 'is-active' : ''}`}>
                       <ul className="product__tabs-list">
                         <li className="item-list">
                           <span className="item-list__title">Артикул:</span>
-                          <p className="item-list__text"> DA4IU67AD5</p>
+                          <p className="item-list__text"> {data.vendorCode}</p>
                         </li>
                         <li className="item-list">
                           <span className="item-list__title">Категория:</span>
-                          <p className="item-list__text">Видеокамера</p>
+                          <p className="item-list__text">{data.category}</p>
                         </li>
                         <li className="item-list">
                           <span className="item-list__title">Тип камеры:</span>
-                          <p className="item-list__text">Коллекционная</p>
+                          <p className="item-list__text">{data.type}</p>
                         </li>
                         <li className="item-list">
                           <span className="item-list__title">Уровень:</span>
-                          <p className="item-list__text">Любительский</p>
+                          <p className="item-list__text">{data.level}</p>
                         </li>
                       </ul>
                     </div>
-                    <div className="tabs__element is-active">
+                    <div className={`tabs__element ${descriptionTabIsActive ? 'is-active' : ''}`}>
                       <div className="product__tabs-text">
                         <p>
-                        Немецкий концерн BRW разработал видеокамеру Das Auge IV
-                        в&nbsp;начале 80-х годов, однако она до&nbsp;сих пор
-                        пользуется популярностью среди коллекционеров
-                        и&nbsp;яростных почитателей старинной техники.
-                        </p>
-                        <p>
-                        Вы&nbsp;тоже можете прикоснуться к&nbsp;волшебству
-                        аналоговой съёмки, заказав этот чудо-аппарат. Кто знает,
-                        может с&nbsp;Das Auge IV&nbsp;начнётся ваш путь
-                        к&nbsp;наградам всех престижных кинофестивалей.
+                          {data.description}
                         </p>
                       </div>
                     </div>
@@ -143,7 +311,8 @@ function Product() {
               <h2 className="title title--h3">Похожие товары</h2>
               <div className="product-similar__slider">
                 <div className="product-similar__slider-list">
-                  <div className="product-card is-active">
+                  {similar.map((it, idx) => <ProductCard data={it} key={it.id} handleBuyButtonClick={handleBuyButtonClick} isActive={[0, 1, 3].includes(idx)}/>)}
+                  {/* <div className="product-card is-active">
                     <div className="product-card__img">
                       <picture>
                         <source
@@ -486,7 +655,7 @@ function Product() {
                       Подробнее
                       </a>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
                 <button
                   className="slider-controls slider-controls--prev"
