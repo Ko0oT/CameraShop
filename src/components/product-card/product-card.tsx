@@ -9,12 +9,11 @@ const isInTheBasket = false;
 type ProductCardProps = {
   data: Product;
   handleBuyButtonClick: (data: Product) => void;
-  isActive?: boolean;
 }
 
-function ProductCard({data, handleBuyButtonClick, isActive}: ProductCardProps) {
+function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
   return (
-    <div className={`product-card ${isActive ? 'is-active' : ''}`}>
+    <div className="product-card" style={{height: '100%', alignItems: 'stretch', flexDirection: 'column'}}>
       <div className="product-card__img">
         <picture>
           <source
@@ -30,7 +29,7 @@ function ProductCard({data, handleBuyButtonClick, isActive}: ProductCardProps) {
           />
         </picture>
       </div>
-      <div className="product-card__info">
+      <div className="product-card__info" style={{alignItems: 'stretch', flexDirection: 'column'}}>
         <div className="rate product-card__rate">
           <StarsRating rating={data.rating}/>
           <p className="visually-hidden">Рейтинг: {data.rating}</p>
