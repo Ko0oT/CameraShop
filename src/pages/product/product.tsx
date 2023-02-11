@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../../components/product-card/product-card';
 import StarsRating from '../../components/stars-rating/stars-rating';
 import { AppRoute, PRODUCTS_PER_SLIDER } from '../../constants';
@@ -193,6 +193,21 @@ function Product() {
 
   const [descriptionTabIsActive, setDescriptionTabIsActive] = useState<boolean>(true);
 
+  const {pathname} = useLocation();
+
+  useEffect(() => {
+    if (pathname.includes(AppRoute.Description)) {
+      setDescriptionTabIsActive(true);
+    }
+
+    if (pathname.includes(AppRoute.Characteristics)) {
+      setDescriptionTabIsActive(false);
+    }
+  }, [pathname]);
+
+  const navigate = useNavigate();
+
+
   //TODO: показать модальное окно.
   // const [modalIsActive, setModalActive] = useState<boolean>(false);
   const handleBuyButtonClick = () => null;
@@ -268,19 +283,23 @@ function Product() {
                   </svg>
                 Добавить в корзину
                 </button>
-
-                {/* При выборе продукта каждая вкладка — таб имеет свой уникальный URL с сохранением текстовой информации. */}
                 <div className="tabs product__tabs">
                   <div className="tabs__controls product__tabs-controls">
                     <button
                       className={`tabs__control ${!descriptionTabIsActive ? 'is-active' : ''}`} type="button"
-                      onClick={() => setDescriptionTabIsActive(false)}
+                      onClick={() => {
+                        setDescriptionTabIsActive(false);
+                        navigate(`${AppRoute.Product}/${data.id}/${AppRoute.Characteristics}`);
+                      }}
                     >
                     Характеристики
                     </button>
                     <button
                       className={`tabs__control ${descriptionTabIsActive ? 'is-active' : ''}`} type="button"
-                      onClick={() => setDescriptionTabIsActive(true)}
+                      onClick={() => {
+                        setDescriptionTabIsActive(true);
+                        navigate(`${AppRoute.Product}/${data.id}/${AppRoute.Description}`);
+                      }}
                     >
                     Описание
                     </button>
@@ -315,6 +334,7 @@ function Product() {
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </section>

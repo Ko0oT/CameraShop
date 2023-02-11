@@ -17,7 +17,10 @@ function App(): JSX.Element {
           <Route path={AppRoute.Root} element={<Layout/>}>
             <Route index element={<Catalog/>}/>
             <Route path={`${AppRoute.Root}/:pageId`} element={<Catalog/>}/>
-            <Route path={`${AppRoute.Product}/:id`} element={<Product/>}/>
+            <Route path={`${AppRoute.Product}/:id`} element={<Product/>}>
+              <Route path={AppRoute.Description} element={<Product/>}/>
+              <Route path={AppRoute.Characteristics} element={<Product/>}/>
+            </ Route>
             <Route path={AppRoute.Basket} element={<Basket/>}/>
           </Route>
           <Route path='*' element={<NotFound />}/>

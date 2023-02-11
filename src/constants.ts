@@ -2,7 +2,9 @@ export const AppRoute = {
   Root: '/',
   Product: '/product',
   Basket: '/basket',
-  NotFound: '/not_found'
+  NotFound: '/not_found',
+  Description: 'description',
+  Characteristics: 'characteristics'
 } as const;
 
 export const NameSpace = {
