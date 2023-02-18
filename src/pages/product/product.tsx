@@ -3,12 +3,14 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../../components/product-card/product-card';
 import StarsRating from '../../components/stars-rating/stars-rating';
-import { AppRoute, PRODUCTS_PER_SLIDER } from '../../constants';
-import { Product as ProductType } from '../../types/types';
+import { AppRoute, INTERSECTION_DELAY, PRODUCTS_PER_SLIDER, REVIEWS_COUNT } from '../../constants';
+import { Product as ProductType, Review as ReviewType } from '../../types/types';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Slider from 'react-slick';
 import './product.css';
+import Review from '../../components/review/review';
+import { useInView } from 'react-intersection-observer';
 
 const data: ProductType = {
   id: 1,
@@ -174,6 +176,189 @@ const similar: ProductType[] = [
   }
 ];
 
+const reviews: ReviewType[] = [
+  {
+    id: '426d46ed-4202-49b6-8b78-4cfdec71b3bd',
+    userName: 'Кирилл',
+    advantage: 'Рекомендую данный аппарат',
+    disadvantage: 'Не рекомендую!',
+    review: 'Приобрела камеру ориентируясь на отзывы, но выявила множество несоответствий. Цена не оправдала ожидания',
+    rating: 2,
+    createAt: '2022-11-15T21:00:06.945Z',
+    cameraId: 1
+  },
+  {
+    id: 'ffde46b0-6b53-4ac3-9e36-b99e14e841a8',
+    userName: 'Ксения',
+    advantage: 'Легкая в плане веса, удобная в интерфейсе, зарядка',
+    disadvantage: 'Нет.',
+    review: 'В целом для домашнего использования в самый раз!',
+    rating: 2,
+    createAt: '2022-09-07T21:00:06.960Z',
+    cameraId: 1
+  },
+  {
+    id: 'a53021c1-9282-4feb-9dec-12c199bc59af',
+    userName: 'Анастасия',
+    advantage: 'Цена соответствует качеству.',
+    disadvantage: 'Тяжелая. Рука быстро устаёт',
+    review: 'Это моя первая камера. Я в восторге, нареканий нет',
+    rating: 5,
+    createAt: '2022-08-04T21:00:06.960Z',
+    cameraId: 1
+  },
+  {
+    id: 'b0252c64-f382-4cea-b771-d264c7512ecd',
+    userName: 'Дарья Артюхова',
+    advantage: 'аовоаооа',
+    disadvantage: 'алалалала',
+    cameraId: 1,
+    review: 'ккккккк',
+    rating: 4,
+    createAt: '2023-02-18T06:38:36.094Z'
+  },
+  {
+    id: '8a2fc712-c381-405b-ba55-6e014125ab45',
+    userName: 'Дарья Артюхова',
+    advantage: 'аовоаооа',
+    disadvantage: 'алалалала',
+    cameraId: 1,
+    review: 'eeeeee',
+    rating: 3,
+    createAt: '2023-02-18T06:41:53.725Z'
+  },
+  {
+    id: 'd19a3fce-588d-4b56-b5b9-bb4c240061a2',
+    rating: 4,
+    cameraId: 1,
+    userName: 'Вася',
+    advantage: 'Все хорошо',
+    disadvantage: 'Нет',
+    review: 'Все отлично',
+    createAt: '2023-02-18T15:18:43.666Z'
+  },
+  {
+    id: '31225948-b9c6-4f1f-b5df-7fa3e6e8d8f9',
+    userName: 'Ксения',
+    advantage: 'Покупали недавно. Пока нареканий нет.',
+    disadvantage: 'Тяжелая. Рука быстро устаёт',
+    review: 'Отличная камера. Великолепные снимки, проста в управлении. Полностью оправдывает стоимость',
+    rating: 2,
+    createAt: '2023-01-13T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: 'e5a3708f-937f-4fb8-a361-c5e43ef63c0f',
+    userName: 'Александр',
+    advantage: 'Легкая в плане веса, удобная в интерфейсе, зарядка',
+    disadvantage: 'Нет.',
+    review: 'Это моя первая камера. Я в восторге, нареканий нет',
+    rating: 3,
+    createAt: '2023-01-15T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '09cc47f7-f7e8-4c04-b0b7-a436c2bb0321',
+    userName: 'Дарья',
+    advantage: 'Легкая в плане веса, удобная в интерфейсе, зарядка',
+    disadvantage: 'Не рекомендую!',
+    review: 'Не возможно найти дополнительные аккамуляторы. К сожалению, те, что идут в комплекте не держут более 7 часов?',
+    rating: 1,
+    createAt: '2023-01-12T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '5f6d10c6-aad0-44d4-8207-a43249d66991',
+    userName: 'Александр',
+    advantage: 'Цена соответствует качеству.',
+    disadvantage: 'Без объектива',
+    review: 'Это моя первая камера. Я в восторге, нареканий нет',
+    rating: 3,
+    createAt: '2022-10-18T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '1df94e5e-b476-47c5-8767-37720600ad64',
+    userName: 'Ольга',
+    advantage: 'Смущает цена',
+    disadvantage: 'Плохая камера, не рекомендую',
+    review: 'Подарила сыну на первое сентября прошлого года. Пришла целой. Для начала камера хорошая.',
+    rating: 4,
+    createAt: '2022-08-13T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '95d24d9d-7bb2-4de0-8cd7-163010c5de05',
+    userName: 'Ксения',
+    advantage: 'Недорогая, за такую цену отличный вариант.',
+    disadvantage: 'Пришла поврежденная упаковка. Нет теперь понимая со внутренностями',
+    review: 'Подарила сыну на первое сентября прошлого года. Пришла целой. Для начала камера хорошая.',
+    rating: 4,
+    createAt: '2022-11-15T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '1556edee-e4b7-4d9f-8b2d-1a2a182a99eb',
+    userName: 'Дарья',
+    advantage: 'Недорогая, за такую цену отличный вариант.',
+    disadvantage: 'Странные звуки при переключении режимов',
+    review: 'Камера для начинающих, самое то. Но урезанный комплект и многое придётся докупать',
+    rating: 3,
+    createAt: '2022-10-18T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '0ef52048-605a-4421-9e6f-82e672ea6a0d',
+    userName: 'Павел',
+    advantage: 'Легкая в плане веса, удобная в интерфейсе, зарядка',
+    disadvantage: 'Не удобный интерфейс и кнопки',
+    review: 'В целом для домашнего использования в самый раз!',
+    rating: 4,
+    createAt: '2022-12-16T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: 'b561fc00-1ddf-437d-92c0-2b514c2be20e',
+    userName: 'Ольга',
+    advantage: 'Недорогая, за такую цену отличный вариант.',
+    disadvantage: 'Плохая камера, не рекомендую',
+    review: 'Камера для начинающих, самое то. Но урезанный комплект и многое придётся докупать',
+    rating: 5,
+    createAt: '2022-09-08T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '1937dcde-e87c-40bf-8433-1b09dcc6021f',
+    userName: 'Анастасия',
+    advantage: 'Смущает цена',
+    disadvantage: 'Странные звуки при переключении режимов',
+    review: 'Хорошая камера. Лучше за эти деньги не найти.',
+    rating: 2,
+    createAt: '2023-02-04T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '5aebfdfc-5f08-43f2-a28a-f4170e6750d1',
+    userName: 'Анастасия',
+    advantage: 'Смущает цена',
+    disadvantage: 'Плохая камера, не рекомендую',
+    review: 'Отличная камера. Великолепные снимки, проста в управлении. Полностью оправдывает стоимость',
+    rating: 4,
+    createAt: '2023-01-04T21:00:06.286Z',
+    cameraId: 3
+  },
+  {
+    id: '80ae485b-2370-401d-9c3e-d4bd1fa36dd4',
+    userName: 'Дарья',
+    advantage: 'Недорогая, за такую цену отличный вариант.',
+    disadvantage: 'Не рекомендую!',
+    review: 'Приобрела камеру ориентируясь на отзывы, но выявила множество несоответствий. Цена не оправдала ожидания',
+    rating: 2,
+    createAt: '2023-01-10T21:00:06.286Z',
+    cameraId: 3
+  }
+];
+
 function Product() {
 
   const slider = useRef<Slider>(null);
@@ -211,6 +396,21 @@ function Product() {
   //TODO: показать модальное окно.
   // const [modalIsActive, setModalActive] = useState<boolean>(false);
   const handleBuyButtonClick = () => null;
+
+
+  const [reviewsCount, setReviewsCount] = useState(REVIEWS_COUNT);
+  const slicedReviews = reviews.slice(0, reviewsCount);
+
+  const { ref, inView } = useInView({
+    threshold: 1,
+    delay: INTERSECTION_DELAY
+  });
+
+  useEffect(() => {
+    if (inView) {
+      setReviewsCount((prev) => prev + REVIEWS_COUNT);
+    }
+  }, [inView]);
 
   return (
     <>
@@ -383,168 +583,42 @@ function Product() {
               <div className="page-content__headed">
                 <h2 className="title title--h3">Отзывы</h2>
                 <button className="btn" type="button">
-                Оставить свой отзыв
+                  Оставить свой отзыв
                 </button>
               </div>
               <ul className="review-block__list">
-                <li className="review-card">
-                  <div className="review-card__head">
-                    <p className="title title--h4">Сергей Горский</p>
-                    <time className="review-card__data" dateTime="2022-04-13">
-                    13 апреля
-                    </time>
-                  </div>
-                  <div className="rate review-card__rate">
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <p className="visually-hidden">Оценка: 5</p>
-                  </div>
-                  <ul className="review-card__list">
-                    <li className="item-list">
-                      <span className="item-list__title">Достоинства:</span>
-                      <p className="item-list__text">
-                      Надёжная, хорошо лежит в руке, необычно выглядит
-                      </p>
-                    </li>
-                    <li className="item-list">
-                      <span className="item-list__title">Недостатки:</span>
-                      <p className="item-list__text">
-                      Тяжеловата, сложно найти плёнку
-                      </p>
-                    </li>
-                    <li className="item-list">
-                      <span className="item-list__title">Комментарий:</span>
-                      <p className="item-list__text">
-                      Раз в полгода достаю из-под стекла, стираю пыль, заряжаю —
-                      работает как часы. Ни у кого из знакомых такой нет, все
-                      завидуют) Теперь это жемчужина моей коллекции, однозначно
-                      стоит своих денег!
-                      </p>
-                    </li>
-                  </ul>
-                </li>
-                <li className="review-card">
-                  <div className="review-card__head">
-                    <p className="title title--h4">Пётр Матросов</p>
-                    <time className="review-card__data" dateTime="2022-03-02">
-                    2 марта
-                    </time>
-                  </div>
-                  <div className="rate review-card__rate">
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-star" />
-                    </svg>
-                    <p className="visually-hidden">Оценка: 1</p>
-                  </div>
-                  <ul className="review-card__list">
-                    <li className="item-list">
-                      <span className="item-list__title">Достоинства:</span>
-                      <p className="item-list__text">Хорошее пресс-папье</p>
-                    </li>
-                    <li className="item-list">
-                      <span className="item-list__title">Недостатки:</span>
-                      <p className="item-list__text">
-                      Через 3 дня развалилась на куски
-                      </p>
-                    </li>
-                    <li className="item-list">
-                      <span className="item-list__title">Комментарий:</span>
-                      <p className="item-list__text">
-                      При попытке вставить плёнку сломался механизм открытия
-                      отсека, пришлось заклеить его изолентой. Начал настраивать
-                      фокус&nbsp;— линза провалилась внутрь корпуса. Пока
-                      доставал — отломилось несколько лепестков диафрагмы. От
-                      злости стукнул камеру об стол, и рукоятка треснула
-                      пополам. Склеил всё суперклеем, теперь прижимаю ей бумагу.
-                      НЕ РЕКОМЕНДУЮ!!!
-                      </p>
-                    </li>
-                  </ul>
-                </li>
-                <li className="review-card">
-                  <div className="review-card__head">
-                    <p className="title title--h4">Татьяна Кузнецова </p>
-                    <time className="review-card__data" dateTime="2021-12-30">
-                    30 декабря
-                    </time>
-                  </div>
-                  <div className="rate review-card__rate">
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-full-star" />
-                    </svg>
-                    <svg width={17} height={16} aria-hidden="true">
-                      <use xlinkHref="#icon-star" />
-                    </svg>
-                    <p className="visually-hidden">Оценка: 4</p>
-                  </div>
-                  <ul className="review-card__list">
-                    <li className="item-list">
-                      <span className="item-list__title">Достоинства:</span>
-                      <p className="item-list__text">Редкая</p>
-                    </li>
-                    <li className="item-list">
-                      <span className="item-list__title">Недостатки:</span>
-                      <p className="item-list__text">Высокая цена</p>
-                    </li>
-                    <li className="item-list">
-                      <span className="item-list__title">Комментарий:</span>
-                      <p className="item-list__text">
-                      Дорого для портативной видеокамеры, но в моей коллекции
-                      как раз не хватало такого экземпляра. Следов использования
-                      нет, доставили в заводской упаковке, выглядит шикарно!
-                      </p>
-                    </li>
-                  </ul>
-                </li>
+                {slicedReviews.map((it) => <Review data={it} key={it.id}/>)}
               </ul>
-              <div className="review-block__buttons">
-                <button className="btn btn--purple" type="button">
-                Показать больше отзывов
-                </button>
-              </div>
+              {reviewsCount < reviews.length
+                ?
+                <div className="review-block__buttons" ref={ref}>
+                  <button
+                    className="btn btn--purple"
+                    type="button"
+                    onClick={() => setReviewsCount((prev) => prev + REVIEWS_COUNT)}
+                  >
+                    Показать больше отзывов
+                  </button>
+                </div>
+                : ''}
             </div>
           </section>
         </div>
       </div>
-      <a className="up-btn" href="#header">
+      <button
+        className="up-btn"
+        onClick={() => {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth',
+          });
+        }}
+      >
         <svg width={12} height={18} aria-hidden="true">
           <use xlinkHref="#icon-arrow2" />
         </svg>
-      </a>
+      </button>
     </>
   );
 }

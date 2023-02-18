@@ -14,3 +14,7 @@ export const NameSpace = {
 export const PRODUCTS_PER_PAGE = 9;
 
 export const PRODUCTS_PER_SLIDER = 3;
+
+export const REVIEWS_COUNT = 3;
+
+export const INTERSECTION_DELAY = 500;
