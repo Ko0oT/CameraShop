@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, KeyboardEvent } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ProductCard from '../../components/product-card/product-card';
@@ -11,6 +11,7 @@ import Slider from 'react-slick';
 import './product.css';
 import Review from '../../components/review/review';
 import { useInView } from 'react-intersection-observer';
+import FocusTrap from 'focus-trap-react';
 
 const data: ProductType = {
   id: 1,
@@ -393,8 +394,20 @@ function Product() {
   const navigate = useNavigate();
 
 
-  //TODO: показать модальное окно.
-  // const [modalIsActive, setModalActive] = useState<boolean>(false);
+  const closeReviewModal = () => {
+    setReviewModalActive(false);
+  };
+
+  const handleEscKeydown = (evt: KeyboardEvent<HTMLDivElement>) => {
+    if(evt.key === 'Escape') {
+      closeReviewModal();
+    }
+  };
+
+  const [reviewModalIsActive, setReviewModalActive] = useState<boolean>(false);
+
+
+  // TODO добавить хендлер кнопки покупки
   const handleBuyButtonClick = () => null;
 
 
@@ -582,7 +595,11 @@ function Product() {
             <div className="container">
               <div className="page-content__headed">
                 <h2 className="title title--h3">Отзывы</h2>
-                <button className="btn" type="button">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => setReviewModalActive(true)}
+                >
                   Оставить свой отзыв
                 </button>
               </div>
@@ -619,6 +636,191 @@ function Product() {
           <use xlinkHref="#icon-arrow2" />
         </svg>
       </button>
+      {reviewModalIsActive
+        ?
+        <FocusTrap>
+          <div
+            className="modal is-active"
+            onKeyDown={handleEscKeydown}
+          >
+            <div className="modal__wrapper">
+              <div
+                className="modal__overlay"
+                onClick={closeReviewModal}
+              />
+              <div className="modal__content">
+                <p className="title title--h4">Оставить отзыв</p>
+                <div className="form-review">
+                  <form method="post">
+                    <div className="form-review__rate">
+                      <fieldset className="rate form-review__item">
+                        <legend className="rate__caption">
+                          Рейтинг
+                          <svg width={9} height={9} aria-hidden="true">
+                            <use xlinkHref="#icon-snowflake" />
+                          </svg>
+                        </legend>
+                        <div className="rate__bar">
+                          <div className="rate__group">
+                            <input
+                              className="visually-hidden"
+                              id="star-5"
+                              name="rate"
+                              type="radio"
+                              defaultValue={5}
+                            />
+                            <label
+                              className="rate__label"
+                              htmlFor="star-5"
+                              title="Отлично"
+                            />
+                            <input
+                              className="visually-hidden"
+                              id="star-4"
+                              name="rate"
+                              type="radio"
+                              defaultValue={4}
+                            />
+                            <label
+                              className="rate__label"
+                              htmlFor="star-4"
+                              title="Хорошо"
+                            />
+                            <input
+                              className="visually-hidden"
+                              id="star-3"
+                              name="rate"
+                              type="radio"
+                              defaultValue={3}
+                            />
+                            <label
+                              className="rate__label"
+                              htmlFor="star-3"
+                              title="Нормально"
+                            />
+                            <input
+                              className="visually-hidden"
+                              id="star-2"
+                              name="rate"
+                              type="radio"
+                              defaultValue={2}
+                            />
+                            <label
+                              className="rate__label"
+                              htmlFor="star-2"
+                              title="Плохо"
+                            />
+                            <input
+                              className="visually-hidden"
+                              id="star-1"
+                              name="rate"
+                              type="radio"
+                              defaultValue={1}
+                            />
+                            <label
+                              className="rate__label"
+                              htmlFor="star-1"
+                              title="Ужасно"
+                            />
+                          </div>
+                          <div className="rate__progress">
+                            <span className="rate__stars">0</span> <span>/</span>{' '}
+                            <span className="rate__all-stars">5</span>
+                          </div>
+                        </div>
+                        <p className="rate__message">Нужно оценить товар</p>
+                      </fieldset>
+                      <div className="custom-input form-review__item">
+                        <label>
+                          <span className="custom-input__label">
+                          Ваше имя
+                            <svg width={9} height={9} aria-hidden="true">
+                              <use xlinkHref="#icon-snowflake" />
+                            </svg>
+                          </span>
+                          <input
+                            type="text"
+                            name="user-name"
+                            placeholder="Введите ваше имя"
+                            required
+                          />
+                        </label>
+                        <p className="custom-input__error">Нужно указать имя</p>
+                      </div>
+                      <div className="custom-input form-review__item">
+                        <label>
+                          <span className="custom-input__label">
+                          Достоинства
+                            <svg width={9} height={9} aria-hidden="true">
+                              <use xlinkHref="#icon-snowflake" />
+                            </svg>
+                          </span>
+                          <input
+                            type="text"
+                            name="user-plus"
+                            placeholder="Основные преимущества товара"
+                            required
+                          />
+                        </label>
+                        <p className="custom-input__error">Нужно указать достоинства</p>
+                      </div>
+                      <div className="custom-input form-review__item">
+                        <label>
+                          <span className="custom-input__label">
+                          Недостатки
+                            <svg width={9} height={9} aria-hidden="true">
+                              <use xlinkHref="#icon-snowflake" />
+                            </svg>
+                          </span>
+                          <input
+                            type="text"
+                            name="user-minus"
+                            placeholder="Главные недостатки товара"
+                            required
+                          />
+                        </label>
+                        <p className="custom-input__error">Нужно указать недостатки</p>
+                      </div>
+                      <div className="custom-textarea form-review__item">
+                        <label>
+                          <span className="custom-textarea__label">
+                            Комментарий
+                            <svg width={9} height={9} aria-hidden="true">
+                              <use xlinkHref="#icon-snowflake" />
+                            </svg>
+                          </span>
+                          <textarea
+                            name="user-comment"
+                            minLength={5}
+                            placeholder="Поделитесь своим опытом покупки"
+                            defaultValue={''}
+                          />
+                        </label>
+                        <div className="custom-textarea__error">
+                          Нужно добавить комментарий
+                        </div>
+                      </div>
+                    </div>
+                    <button className="btn btn--purple form-review__btn" type="submit">
+                      Отправить отзыв
+                    </button>
+                  </form>
+                </div>
+                <button
+                  className="cross-btn"
+                  type="button"
+                  aria-label="Закрыть попап"
+                  onClick={closeReviewModal}
+                >
+                  <svg width={10} height={10} aria-hidden="true">
+                    <use xlinkHref="#icon-close" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </FocusTrap>
+        : ''}
     </>
   );
 }
