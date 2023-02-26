@@ -13,6 +13,7 @@ import Review from '../../components/review/review';
 import { useInView } from 'react-intersection-observer';
 import FocusTrap from 'focus-trap-react';
 import ReviewForm from '../../components/review-form/review-form';
+import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 
 const data: ProductType = {
   id: 1,
@@ -398,6 +399,24 @@ function Product() {
   const [reviewModalIsActive, setReviewModalActive] = useState<boolean>(false);
   const [successModalIsActive, setSuccessModalIsActive] = useState<boolean>(false);
 
+
+  const reviewModalRef = useRef(null);
+  const successModalRef = useRef(null);
+
+  useEffect(() => {
+    if (reviewModalRef.current) {
+      disableBodyScroll(reviewModalRef.current);
+    } else if (successModalRef.current) {
+      disableBodyScroll(successModalRef.current);
+    } else {
+      clearAllBodyScrollLocks();
+    }
+    return () => {
+      clearAllBodyScrollLocks();
+    };
+  }, [reviewModalIsActive, successModalIsActive]);
+
+
   const closeReviewModal = () => {
     setReviewModalActive(false);
   };
@@ -659,6 +678,7 @@ function Product() {
           <div
             className="modal is-active"
             onKeyDown={handleEscKeydown}
+            ref={reviewModalRef}
           >
             <div className="modal__wrapper">
               <div
@@ -689,6 +709,7 @@ function Product() {
           <div
             className="modal is-active modal--narrow"
             onKeyDown={handleEscKeydown}
+            ref={successModalRef}
           >
             <div className="modal__wrapper">
               <div
