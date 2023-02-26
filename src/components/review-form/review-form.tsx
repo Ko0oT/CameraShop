@@ -1,6 +1,7 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Review, ReviewPost } from '../../types/types';
+import { FormUncontrollableInput, Review } from '../../types/types';
+import { useForm } from 'react-hook-form';
 
 type ReviewFormProps = {
   handleReviewsChange: (newReview: Review) => void;
@@ -10,60 +11,42 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
 
   const { id } = useParams();
 
-  const initialFormState: ReviewPost = {
-    cameraId: Number(id),
-    userName: '',
-    advantage: '',
-    disadvantage: '',
-    review: '',
-    rating: 0,
-  };
-
-  const [formData, setFormData] = useState(initialFormState);
   const [isFormDisabled, setIsFormDisabled] = useState<boolean>(false);
 
-  const handleFieldChange = (evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {name, value} = evt.target;
+  const {
+    register,
+    watch,
+    formState: {
+      errors, isValid,
+    },
+    handleSubmit,
+  } = useForm<FormUncontrollableInput>({
+    mode: 'all'
+  });
 
-    if (name === 'rating') {
-      setFormData({
-        ...formData,
-        rating: Number(value),
-      });
-      return;
-    }
+  const watchRating = watch('rating');
 
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleFormSubmmit = (evt: FormEvent<HTMLFormElement>) => {
-    evt.preventDefault();
+  const onSubmit = (data: FormUncontrollableInput) => {
     setIsFormDisabled(true);
     // api.post<Review>(`${APIRoute.Review}`, formData).then((response) => handleReviewsChange(response.data))
     //   .then(() => setFormData(initialFormState))
     //   .finally(() => setIsFormDisabled(false));
 
-    // Временно
-    handleReviewsChange(formData as Review);
-  };
+    // api.post<BookedQuest>(`${APIRoute.Quests}/${id as string}/booking`, {...data, cameraId: Number(id)})
+    // .then(() => navigate(AppRoute.MyQuests))
+    // .finally(() => setIsSendingData(false));
 
-  const isRatingInvalid = formData.rating === 0;
-  const isUserNameInvalid = formData.userName.length === 0;
-  const isAdvantageInvalid = formData.advantage.length === 0;
-  const isDisadvantageInvalid = formData.disadvantage.length === 0;
-  const isReviewInvalid = formData.review.length < 5;
+    handleReviewsChange(data as Review);
+  };
 
   return (
     <div className="form-review">
       <form
         method="post"
-        onSubmit={handleFormSubmmit}
+        onSubmit={handleSubmit(onSubmit)}
       >
         <div className="form-review__rate">
-          <fieldset className={`rate form-review__item ${isRatingInvalid ? 'is-invalid' : ''}`}>
+          <fieldset className={`rate form-review__item ${errors?.rating ? 'is-invalid' : ''}`}>
             <legend className="rate__caption">
             Рейтинг
               <svg width={9} height={9} aria-hidden="true">
@@ -73,13 +56,13 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
             <div className="rate__bar">
               <div className="rate__group">
                 <input
+                  {...register('rating', {
+                    required: true,
+                  })}
                   className="visually-hidden"
                   id="star-5"
-                  name="rating"
                   type="radio"
-                  defaultValue={5}
-                  checked={Number(formData.rating) === 5}
-                  onChange={handleFieldChange}
+                  value={5}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -88,13 +71,13 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   title="Отлично"
                 />
                 <input
+                  {...register('rating', {
+                    required: true,
+                  })}
                   className="visually-hidden"
                   id="star-4"
-                  name="rating"
                   type="radio"
-                  defaultValue={4}
-                  checked={Number(formData.rating) === 4}
-                  onChange={handleFieldChange}
+                  value={4}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -103,13 +86,13 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   title="Хорошо"
                 />
                 <input
+                  {...register('rating', {
+                    required: true,
+                  })}
                   className="visually-hidden"
                   id="star-3"
-                  name="rating"
                   type="radio"
-                  defaultValue={3}
-                  checked={Number(formData.rating) === 3}
-                  onChange={handleFieldChange}
+                  value={3}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -118,13 +101,13 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   title="Нормально"
                 />
                 <input
+                  {...register('rating', {
+                    required: true,
+                  })}
                   className="visually-hidden"
                   id="star-2"
-                  name="rating"
                   type="radio"
-                  defaultValue={2}
-                  checked={Number(formData.rating) === 2}
-                  onChange={handleFieldChange}
+                  value={2}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -133,13 +116,13 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   title="Плохо"
                 />
                 <input
+                  {...register('rating', {
+                    required: true,
+                  })}
                   className="visually-hidden"
                   id="star-1"
-                  name="rating"
                   type="radio"
-                  defaultValue={1}
-                  checked={Number(formData.rating) === 1}
-                  onChange={handleFieldChange}
+                  value={1}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -149,13 +132,13 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 />
               </div>
               <div className="rate__progress">
-                <span className="rate__stars">{formData.rating}</span> <span>/</span>{' '}
+                <span className="rate__stars">{watchRating ? watchRating : 0}</span> <span>/</span>{' '}
                 <span className="rate__all-stars">5</span>
               </div>
             </div>
             <p className="rate__message">Нужно оценить товар</p>
           </fieldset>
-          <div className={`custom-input form-review__item ${isUserNameInvalid ? 'is-invalid' : ''}`}>
+          <div className={`custom-input form-review__item ${errors?.userName ? 'is-invalid' : ''}`}>
             <label>
               <span className="custom-input__label">
             Ваше имя
@@ -164,18 +147,17 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 </svg>
               </span>
               <input
+                {...register('userName', {
+                  required: 'Поле обязателько к заполнению'
+                })}
                 type="text"
-                name="userName"
                 placeholder="Введите ваше имя"
-                required
-                onChange={handleFieldChange}
-                value={formData.userName}
                 disabled={isFormDisabled}
               />
             </label>
             <p className="custom-input__error">Нужно указать имя</p>
           </div>
-          <div className={`custom-input form-review__item ${isAdvantageInvalid ? 'is-invalid' : ''}`}>
+          <div className={`custom-input form-review__item ${errors?.advantage ? 'is-invalid' : ''}`}>
             <label>
               <span className="custom-input__label">
             Достоинства
@@ -184,18 +166,17 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 </svg>
               </span>
               <input
+                {...register('advantage', {
+                  required: 'Поле обязателько к заполнению'
+                })}
                 type="text"
-                name="advantage"
                 placeholder="Основные преимущества товара"
-                required
-                onChange={handleFieldChange}
-                value={formData.advantage}
                 disabled={isFormDisabled}
               />
             </label>
             <p className="custom-input__error">Нужно указать достоинства</p>
           </div>
-          <div className={`custom-input form-review__item ${isDisadvantageInvalid ? 'is-invalid' : ''}`}>
+          <div className={`custom-input form-review__item ${errors?.disadvantage ? 'is-invalid' : ''}`}>
             <label>
               <span className="custom-input__label">
             Недостатки
@@ -204,18 +185,17 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 </svg>
               </span>
               <input
+                {...register('disadvantage', {
+                  required: 'Поле обязателько к заполнению'
+                })}
                 type="text"
-                name="disadvantage"
                 placeholder="Главные недостатки товара"
-                required
-                onChange={handleFieldChange}
-                value={formData.disadvantage}
                 disabled={isFormDisabled}
               />
             </label>
             <p className="custom-input__error">Нужно указать недостатки</p>
           </div>
-          <div className={`custom-textarea form-review__item ${isReviewInvalid ? 'is-invalid' : ''}`}>
+          <div className={`custom-textarea form-review__item ${errors?.review ? 'is-invalid' : ''}`}>
             <label>
               <span className="custom-textarea__label">
               Комментарий
@@ -224,23 +204,26 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 </svg>
               </span>
               <textarea
-                name="review"
-                minLength={5}
+                {...register('review', {
+                  required: 'Нужно добавить комментарий',
+                  minLength: {
+                    value: 5,
+                    message: 'Минимум 5 символов'
+                  },
+                })}
                 placeholder="Поделитесь своим опытом покупки"
-                onChange={handleFieldChange}
-                value={formData.review}
                 disabled={isFormDisabled}
               />
             </label>
             <div className="custom-textarea__error">
-            Нужно добавить комментарий
+              {errors?.review?.message}
             </div>
           </div>
         </div>
         <button
           className="btn btn--purple form-review__btn"
           type="submit"
-          disabled={isRatingInvalid || isUserNameInvalid || isAdvantageInvalid || isDisadvantageInvalid || isReviewInvalid || isFormDisabled}
+          disabled={isFormDisabled || !isValid}
         >
           {isFormDisabled ? 'Отправляю...' : 'Отправить отзыв'}
         </button>

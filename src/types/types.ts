@@ -34,3 +34,5 @@ export type ReviewPost = {
   review: string;
   rating: number;
 };
+
+export type FormUncontrollableInput = Omit<ReviewPost, 'cameraId'>;
