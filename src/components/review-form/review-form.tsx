@@ -1,21 +1,40 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState, ChangeEvent } from 'react';
 import { useParams } from 'react-router-dom';
-import { FormUncontrollableInput, Review } from '../../types/types';
+import { FormControllableInput, FormUncontrollableInput, Review as ReviewType } from '../../types/types';
 import { useForm } from 'react-hook-form';
+import { createAPI } from '../../services/api';
+import { APIRoute } from '../../constants';
 
 type ReviewFormProps = {
-  handleReviewsChange: (newReview: Review) => void;
+  handleReviewsChange: (newReview: ReviewType) => void;
 };
 
 function ReviewForm({handleReviewsChange}: ReviewFormProps) {
 
   const { id } = useParams();
+  const api = useMemo(() => createAPI(), []);
 
+  const initialFormState: FormControllableInput = {
+    cameraId: Number(id),
+    rating: 0,
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
   const [isFormDisabled, setIsFormDisabled] = useState<boolean>(false);
+
+  const isRatingInputInvalid = formData.rating === 0;
+
+  const handleFieldChange = (evt: ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = evt.target;
+
+    setFormData({
+      ...formData,
+      [name]: Number(value),
+    });
+  };
 
   const {
     register,
-    watch,
     formState: {
       errors, isValid,
     },
@@ -24,19 +43,15 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
     mode: 'all'
   });
 
-  const watchRating = watch('rating');
 
-  const onSubmit = (data: FormUncontrollableInput) => {
+  const onSubmit = async (data: FormUncontrollableInput) => {
     setIsFormDisabled(true);
-    // api.post<Review>(`${APIRoute.Review}`, formData).then((response) => handleReviewsChange(response.data))
-    //   .then(() => setFormData(initialFormState))
-    //   .finally(() => setIsFormDisabled(false));
-
-    // api.post<BookedQuest>(`${APIRoute.Quests}/${id as string}/booking`, {...data, cameraId: Number(id)})
-    // .then(() => navigate(AppRoute.MyQuests))
-    // .finally(() => setIsSendingData(false));
-
-    handleReviewsChange(data as Review);
+    try {
+      const response = await api.post<ReviewType>(`${APIRoute.Reviews}`, {...data, ...formData});
+      handleReviewsChange(response.data);
+    } finally {
+      setIsFormDisabled(false);
+    }
   };
 
   return (
@@ -46,7 +61,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="form-review__rate">
-          <fieldset className={`rate form-review__item ${errors?.rating ? 'is-invalid' : ''}`}>
+          <fieldset className={`rate form-review__item ${isRatingInputInvalid ? 'is-invalid' : ''}`}>
             <legend className="rate__caption">
             Рейтинг
               <svg width={9} height={9} aria-hidden="true">
@@ -56,13 +71,14 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
             <div className="rate__bar">
               <div className="rate__group">
                 <input
-                  {...register('rating', {
-                    required: true,
-                  })}
+                  checked={Number(formData.rating) === 5}
+                  onChange={handleFieldChange}
+                  name={'rating'}
+                  required
                   className="visually-hidden"
                   id="star-5"
                   type="radio"
-                  value={5}
+                  defaultValue={5}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -71,13 +87,14 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   title="Отлично"
                 />
                 <input
-                  {...register('rating', {
-                    required: true,
-                  })}
+                  checked={Number(formData.rating) === 4}
+                  onChange={handleFieldChange}
+                  name={'rating'}
+                  required
                   className="visually-hidden"
                   id="star-4"
                   type="radio"
-                  value={4}
+                  defaultValue={4}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -86,13 +103,14 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   title="Хорошо"
                 />
                 <input
-                  {...register('rating', {
-                    required: true,
-                  })}
+                  checked={Number(formData.rating) === 3}
+                  onChange={handleFieldChange}
+                  name={'rating'}
+                  required
                   className="visually-hidden"
                   id="star-3"
                   type="radio"
-                  value={3}
+                  defaultValue={3}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -101,13 +119,14 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   title="Нормально"
                 />
                 <input
-                  {...register('rating', {
-                    required: true,
-                  })}
+                  checked={Number(formData.rating) === 2}
+                  onChange={handleFieldChange}
+                  name={'rating'}
+                  required
                   className="visually-hidden"
                   id="star-2"
                   type="radio"
-                  value={2}
+                  defaultValue={2}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -116,13 +135,14 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   title="Плохо"
                 />
                 <input
-                  {...register('rating', {
-                    required: true,
-                  })}
+                  checked={Number(formData.rating) === 1}
+                  onChange={handleFieldChange}
+                  name={'rating'}
+                  required
                   className="visually-hidden"
                   id="star-1"
                   type="radio"
-                  value={1}
+                  defaultValue={1}
                   disabled={isFormDisabled}
                 />
                 <label
@@ -132,7 +152,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 />
               </div>
               <div className="rate__progress">
-                <span className="rate__stars">{watchRating ? watchRating : 0}</span> <span>/</span>{' '}
+                <span className="rate__stars">{formData.rating}</span> <span>/</span>{' '}
                 <span className="rate__all-stars">5</span>
               </div>
             </div>
@@ -223,7 +243,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
         <button
           className="btn btn--purple form-review__btn"
           type="submit"
-          disabled={isFormDisabled || !isValid}
+          disabled={isFormDisabled || !isValid || isRatingInputInvalid}
         >
           {isFormDisabled ? 'Отправляю...' : 'Отправить отзыв'}
         </button>

@@ -7,6 +7,12 @@ export const AppRoute = {
   Characteristics: 'characteristics'
 } as const;
 
+export const APIRoute = {
+  Cameras: '/cameras',
+  Similar: 'similar',
+  Reviews: '/reviews'
+} as const;
+
 export const NameSpace = {
   App: 'APP',
 } as const;

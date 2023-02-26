@@ -35,4 +35,6 @@ export type ReviewPost = {
   rating: number;
 };
 
-export type FormUncontrollableInput = Omit<ReviewPost, 'cameraId'>;
+export type FormUncontrollableInput = Omit<ReviewPost, 'cameraId' | 'rating'>;
+
+export type FormControllableInput = Pick<ReviewPost, 'cameraId' | 'rating'>;
