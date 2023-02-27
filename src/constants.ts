@@ -10,11 +10,13 @@ export const AppRoute = {
 export const APIRoute = {
   Cameras: '/cameras',
   Similar: 'similar',
-  Reviews: '/reviews'
+  Reviews: '/reviews',
+  Promo: '/promo',
 } as const;
 
 export const NameSpace = {
   App: 'APP',
+  Data: 'DATA'
 } as const;
 
 export const PRODUCTS_PER_PAGE = 9;
