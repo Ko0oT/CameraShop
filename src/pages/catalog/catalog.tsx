@@ -8,7 +8,7 @@ import { getCurrentPage } from '../../store/app-process/app-process-selectors';
 import { Product } from '../../types/types';
 import { resetPage, setCurrentPage } from '../../store/app-process/app-process-slice';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPageNumbers } from '../../utils';
+import { getPageNumbers } from '../../utils/utils';
 import { Helmet } from 'react-helmet-async';
 import ProductPreview from '../../components/product-preview/product-preview';
 import { getCameras } from '../../store/app-data/app-data-selectors';
