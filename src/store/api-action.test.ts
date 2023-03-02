@@ -20,7 +20,7 @@ describe('Async actions', () => {
   >(middlewares);
 
   test('should dispatch Load_Cameras when GET /cameras', async () => {
-    const mockCameras = makeFakeCameras();
+    const mockCameras = makeFakeCameras(30);
     mockAPI
       .onGet(APIRoute.Cameras)
       .reply(200, mockCameras);

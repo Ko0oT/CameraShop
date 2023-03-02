@@ -13,7 +13,7 @@ type ProductCardProps = {
 
 function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
   return (
-    <div className="product-card" style={{height: '100%', alignItems: 'stretch', flexDirection: 'column'}}>
+    <div className="product-card" style={{height: '100%', alignItems: 'stretch', flexDirection: 'column'}} data-testid="card">
       <div className="product-card__img">
         <picture>
           <source

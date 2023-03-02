@@ -1,13 +1,13 @@
 import { Product, Promo, Review } from '../types/types';
-import { datatype, random, commerce, system, internet } from 'faker';
+import { datatype, random, commerce, internet } from 'faker';
 
 export const makeFakePromo = (): Promo => ({
   id: datatype.number(),
   name: random.words(2),
-  previewImg: system.filePath(),
-  previewImg2x: system.filePath(),
-  previewImgWebp: system.filePath(),
-  previewImgWebp2x: system.filePath(),
+  previewImg: 'img/content/das-auge.jpg',
+  previewImg2x: 'img/content/das-auge@2x.jpg',
+  previewImgWebp: 'img/content/das-auge.webp',
+  previewImgWebp2x: 'img/content/das-auge@2x.webp',
 });
 
 export const makeFakeCamera = (): Product => ({
@@ -17,17 +17,17 @@ export const makeFakeCamera = (): Product => ({
   type: commerce.product(),
   category: commerce.product(),
   description: commerce.productDescription(),
-  previewImg: system.filePath(),
-  previewImg2x: system.filePath(),
-  previewImgWebp: system.filePath(),
-  previewImgWebp2x: system.filePath(),
+  previewImg: 'img/content/das-auge.jpg',
+  previewImg2x: 'img/content/das-auge@2x.jpg',
+  previewImgWebp: 'img/content/das-auge.webp',
+  previewImgWebp2x: 'img/content/das-auge@2x.webp',
   level: random.words(1),
   rating: datatype.number({min: 1, max: 5}),
   price: datatype.number(),
   reviewCount: datatype.number(),
 } as Product);
 
-export const makeFakeCameras = (): Product[] => new Array(30).fill(null).map(() => makeFakeCamera());
+export const makeFakeCameras = (count: number): Product[] => new Array(count).fill(null).map(() => makeFakeCamera());
 
 export const makeFakeReview = (): Review => ({
   id: String(datatype.number()),
@@ -40,5 +40,5 @@ export const makeFakeReview = (): Review => ({
   cameraId: datatype.number(),
 });
 
-export const makeFakeReviews = (): Review[] => new Array(10).fill(null).map(() => makeFakeReview());
+export const makeFakeReviews = (count: number): Review[] => new Array(count).fill(null).map(() => makeFakeReview());
 
