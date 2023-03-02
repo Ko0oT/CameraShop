@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../constants';
 
-function NotFound() {
+function NotFound(): JSX.Element {
   const style = {
     marginLeft: '40px'
   };
