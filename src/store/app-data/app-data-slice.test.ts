@@ -5,7 +5,7 @@ import { appData } from './app-data-slice';
 import { Product, Promo } from '../../types/types';
 
 
-const cameras = makeFakeCameras();
+const cameras = makeFakeCameras(30);
 const promo = makeFakePromo();
 
 describe('Reducer: appData', () => {

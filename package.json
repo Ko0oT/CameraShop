@@ -84,15 +84,17 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/body-scroll-lock": "^3.1.0",
     "@types/faker": "^5.5.8",
-    "@types/jest": "^29.1.2",
+    "@types/jest": "^29.4.0",
     "@types/node": "^16.11.7",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
     "@types/react-redux": "^7.1.24",
     "@types/react-slick": "^0.23.10",
+    "@types/tabbable": "^3.1.2",
     "axios-mock-adapter": "^1.21.2",
     "eslint-config-htmlacademy": "^8.0.0",
     "faker": "^5.5.3",
+    "intersection-observer": "^0.12.2",
     "typescript": "^4.8.4"
   }
 }

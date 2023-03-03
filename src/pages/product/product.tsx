@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, KeyboardEvent, useMemo } from 'react';
+import React, { useEffect, useRef, useState, KeyboardEvent } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import ProductCard from '../../components/product-card/product-card';
@@ -19,7 +19,7 @@ import LoadingScreen from '../../components/loading-screen/loading-screen';
 
 
 function Product() {
-  const api = useMemo(() => createAPI(), []);
+  const api = createAPI();
   const {id} = useParams();
   const navigate = useNavigate();
 
@@ -45,7 +45,7 @@ function Product() {
       setActiveSlide(0);
       setDescriptionTabIsActive(true);
     };
-  }, [id, api]);
+  }, [id]);
 
 
   const slider = useRef<Slider>(null);
@@ -149,7 +149,7 @@ function Product() {
       <Helmet>
         <title>{productData.name}</title>
       </Helmet>
-      <div className="page-content">
+      <div className="page-content" data-testid="product">
         <div className="breadcrumbs">
           <div className="container">
             <ul className="breadcrumbs__list">
@@ -237,7 +237,7 @@ function Product() {
                     </button>
                   </div>
                   <div className="tabs__content">
-                    <div className={`tabs__element ${!descriptionTabIsActive ? 'is-active' : ''}`}>
+                    <div className={`tabs__element ${!descriptionTabIsActive ? 'is-active' : ''}`} data-testid="characteristics-tab">
                       <ul className="product__tabs-list">
                         <li className="item-list">
                           <span className="item-list__title">Артикул:</span>
@@ -257,7 +257,7 @@ function Product() {
                         </li>
                       </ul>
                     </div>
-                    <div className={`tabs__element ${descriptionTabIsActive ? 'is-active' : ''}`}>
+                    <div className={`tabs__element ${descriptionTabIsActive ? 'is-active' : ''}`} data-testid="description-tab">
                       <div className="product__tabs-text">
                         <p>
                           {productData.description}
@@ -327,7 +327,10 @@ function Product() {
               </ul>
               {reviewsCount < reviewsData.length
                 ?
-                <div className="review-block__buttons" ref={ref}>
+                <div
+                  className="review-block__buttons"
+                  ref={ref}
+                >
                   <button
                     className="btn btn--purple"
                     type="button"

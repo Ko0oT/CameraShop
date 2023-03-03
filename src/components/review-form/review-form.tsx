@@ -80,6 +80,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                   type="radio"
                   defaultValue={5}
                   disabled={isFormDisabled}
+                  data-testid="star"
                 />
                 <label
                   className="rate__label"
@@ -173,6 +174,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 type="text"
                 placeholder="Введите ваше имя"
                 disabled={isFormDisabled}
+                data-testid="userName"
               />
             </label>
             <p className="custom-input__error">Нужно указать имя</p>
@@ -192,6 +194,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 type="text"
                 placeholder="Основные преимущества товара"
                 disabled={isFormDisabled}
+                data-testid="advantage"
               />
             </label>
             <p className="custom-input__error">Нужно указать достоинства</p>
@@ -211,6 +214,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 type="text"
                 placeholder="Главные недостатки товара"
                 disabled={isFormDisabled}
+                data-testid="disadvantage"
               />
             </label>
             <p className="custom-input__error">Нужно указать недостатки</p>
@@ -233,6 +237,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 })}
                 placeholder="Поделитесь своим опытом покупки"
                 disabled={isFormDisabled}
+                data-testid="review"
               />
             </label>
             <div className="custom-textarea__error">
@@ -244,6 +249,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
           className="btn btn--purple form-review__btn"
           type="submit"
           disabled={isFormDisabled || !isValid || isRatingInputInvalid}
+          data-testid="submit"
         >
           {isFormDisabled ? 'Отправляю...' : 'Отправить отзыв'}
         </button>
