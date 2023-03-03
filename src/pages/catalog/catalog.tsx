@@ -23,7 +23,7 @@ function Catalog() {
 
   const {pageId} = useParams();
 
-  const pagesCount = Math.ceil(cameras.length / PRODUCTS_PER_PAGE);
+  const pagesCount = Math.ceil(cameras?.length / PRODUCTS_PER_PAGE);
   const pageNumbers: number[] = useMemo(() => getPageNumbers(pagesCount), [pagesCount]);
 
   useEffect(() => {
