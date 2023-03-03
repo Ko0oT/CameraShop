@@ -5,12 +5,12 @@ type StarsRatingProps = {
 }
 
 const FullStarIcon = () => (
-  <svg width={17} height={16} aria-hidden="true">
+  <svg width={17} height={16} aria-hidden="true" data-testid="fullStarIcon">
     <use xlinkHref="#icon-full-star" />
   </svg>);
 
 const EmptyStarIcon = () => (
-  <svg width={17} height={16} aria-hidden="true">
+  <svg width={17} height={16} aria-hidden="true" data-testid="emptyStarIcon">
     <use xlinkHref="#icon-star" />
   </svg>);
 
