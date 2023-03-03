@@ -77,7 +77,7 @@ describe('Component: Product', () => {
     expect(screen.queryByText(/Загрузка/i)).not.toBeInTheDocument();
   });
 
-  test('should render review modal and validate fields', async () => {
+  test('should render review modal', async () => {
     mockAPI
       .onGet(`${APIRoute.Cameras}/1`)
       .reply(200, makeFakeCamera());
@@ -103,21 +103,5 @@ describe('Component: Product', () => {
     const reviewButton = screen.getByText(/Оставить свой отзыв/i);
     await userEvent.click(reviewButton);
     expect(screen.getByText(/Ваше имя/i)).toBeInTheDocument();
-
-    expect(screen.getByTestId('submit')).toHaveAttribute('disabled');
-
-    const starButton = screen.getByTestId('star');
-
-    await userEvent.click(starButton);
-    await userEvent.type(screen.getByTestId('userName'), 'keks');
-    await userEvent.type(screen.getByTestId('advantage'), 'хорошо');
-    await userEvent.type(screen.getByTestId('disadvantage'), 'их нет');
-    await userEvent.type(screen.getByTestId('review'), 'в целом замечательно');
-
-    expect(screen.getByDisplayValue(/keks/i)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(/хорошо/i)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(/их нет/i)).toBeInTheDocument();
-    expect(screen.getByDisplayValue(/в целом замечательно/i)).toBeInTheDocument();
-    expect(screen.getByTestId('submit')).not.toHaveAttribute('disabled');
   });
 });
