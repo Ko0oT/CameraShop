@@ -10,7 +10,7 @@ import Catalog from './catalog';
 const mockStore = configureMockStore();
 
 describe('Component: Catalog', () => {
-  test('should render correctly cameras is not empty', () => {
+  test('should render correctly when cameras is not empty', () => {
     const store = mockStore({
       DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
       APP: {currentPage: 1,}
@@ -51,26 +51,7 @@ describe('Component: Catalog', () => {
     expect(screen.queryByText(/Далее/i)).not.toBeInTheDocument();
   });
 
-  test('should render active pagination button correctly', () => {
-    const store = mockStore({
-      DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
-      APP: {currentPage: 2,}
-    });
-
-    render(
-      <Provider store={store}>
-        <HelmetProvider>
-          <BrowserRouter>
-            <Catalog />
-          </BrowserRouter>
-        </HelmetProvider>
-      </Provider>
-    );
-
-    expect(screen.getByText('2')).toHaveClass('pagination__link--active');
-  });
-
-  test('should\'t render \'next\' pagination button when cameras less or equal product per page', () => {
+  test('should\'t render pagination when cameras less or equal product per page', () => {
     const store = mockStore({
       DATA: {cameras: makeFakeCameras(PRODUCTS_PER_PAGE), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
       APP: {currentPage: 1,}
@@ -87,6 +68,8 @@ describe('Component: Catalog', () => {
     );
 
     expect(screen.getAllByTestId('card')).toBeInstanceOf(Array);
+    expect(screen.queryByText('1')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Назад/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Далее/i)).not.toBeInTheDocument();
   });
 
