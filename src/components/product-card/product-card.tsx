@@ -61,6 +61,7 @@ function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
             className="btn btn--purple product-card__btn"
             type="button"
             onClick={() => handleBuyButtonClick(data)}
+            data-testid="buyButton"
           >
             Купить
           </button>}
