@@ -11,7 +11,7 @@ function ProductPreview({data, isActive, handleCloseButtonClick}: ProductPreview
   return (
     <div className={`modal ${isActive ? 'is-active' : ''}`}>
       <div className="modal__wrapper">
-        <div className="modal__overlay" onClick={handleCloseButtonClick}/>
+        <div className="modal__overlay" onClick={handleCloseButtonClick} data-testid="overlay"/>
         <div className="modal__content">
           <p className="title title--h4">Добавить товар в корзину</p>
           <div className="basket-item basket-item--short">
@@ -61,6 +61,7 @@ function ProductPreview({data, isActive, handleCloseButtonClick}: ProductPreview
             type="button"
             aria-label="Закрыть попап"
             onClick={handleCloseButtonClick}
+            data-testid="closeButton"
           >
             <svg width={10} height={10} aria-hidden="true">
               <use xlinkHref="#icon-close" />
