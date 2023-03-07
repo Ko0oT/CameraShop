@@ -1,4 +1,4 @@
-import { render, screen, cleanup, getByText } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import MockAdapter from 'axios-mock-adapter';
 import { HelmetProvider } from 'react-helmet-async';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';

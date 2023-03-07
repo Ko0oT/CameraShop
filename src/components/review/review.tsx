@@ -1,4 +1,3 @@
-import React from 'react';
 import { Review as ReviewType } from '../../types/types';
 import StarsRating from './../stars-rating/stars-rating';
 

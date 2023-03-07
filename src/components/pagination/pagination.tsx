@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAppSelector } from '../../hooks';
 import { Link } from 'react-router-dom';
 import { getCurrentPage } from '../../store/app-process/app-process-selectors';

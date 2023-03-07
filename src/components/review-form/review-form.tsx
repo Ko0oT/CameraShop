@@ -1,4 +1,4 @@
-import React, { useMemo, useState, ChangeEvent } from 'react';
+import { useMemo, useState, ChangeEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { FormControllableInput, FormUncontrollableInput, Review as ReviewType } from '../../types/types';
 import { useForm } from 'react-hook-form';

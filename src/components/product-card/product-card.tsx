@@ -1,4 +1,3 @@
-import React from 'react';
 import { Product } from '../../types/types';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../constants';
