@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { FormControllableInput, FormUncontrollableInput, Review as ReviewType } from '../../types/types';
 import { useForm } from 'react-hook-form';
 import { createAPI } from '../../services/api';
-import { APIRoute } from '../../constants';
+import { APIRoute, MAX_STARS_RATING, REVIEW_COMMENT_MIN_LENGTH, USEFORM_MODE } from '../../constants';
 
 type ReviewFormProps = {
   handleReviewsChange: (newReview: ReviewType) => void;
@@ -40,7 +40,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
     },
     handleSubmit,
   } = useForm<FormUncontrollableInput>({
-    mode: 'all'
+    mode: USEFORM_MODE
   });
 
 
@@ -154,7 +154,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
               </div>
               <div className="rate__progress">
                 <span className="rate__stars">{formData.rating}</span> <span>/</span>{' '}
-                <span className="rate__all-stars">5</span>
+                <span className="rate__all-stars">{MAX_STARS_RATING}</span>
               </div>
             </div>
             <p className="rate__message">Нужно оценить товар</p>
@@ -231,8 +231,8 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
                 {...register('review', {
                   required: 'Нужно добавить комментарий',
                   minLength: {
-                    value: 5,
-                    message: 'Минимум 5 символов'
+                    value: REVIEW_COMMENT_MIN_LENGTH,
+                    message: `Минимум ${REVIEW_COMMENT_MIN_LENGTH} символов`
                   },
                 })}
                 placeholder="Поделитесь своим опытом покупки"

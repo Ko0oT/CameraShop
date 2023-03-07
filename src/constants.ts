@@ -26,3 +26,13 @@ export const PRODUCTS_PER_SLIDER = 3;
 export const REVIEWS_COUNT = 3;
 
 export const INTERSECTION_DELAY = 500;
+
+export const USEFORM_MODE = 'all';
+
+export const MAX_STARS_RATING = 5;
+
+export const REVIEW_COMMENT_MIN_LENGTH = 5;
+
+export const MAIN_CONTENT_POSITION = 500;
+
+export const UNAUTHORIZED_STATUS_CODE = 401;

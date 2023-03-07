@@ -1,3 +1,5 @@
+import { MAX_STARS_RATING } from '../../constants';
+
 type StarsRatingProps = {
   rating: number;
 }
@@ -16,7 +18,7 @@ function StarsRating({rating}: StarsRatingProps) {
   return (
     <>
       {Array.from({length: rating}, (_, i) => i).map((it) => <FullStarIcon key={it}/>)}
-      {Array.from({length: 5 - rating}, (_, i) => i).map((it) => <EmptyStarIcon key={it}/>)}
+      {Array.from({length: MAX_STARS_RATING - rating}, (_, i) => i).map((it) => <EmptyStarIcon key={it}/>)}
     </>
   );
 }
