@@ -201,7 +201,7 @@ function Product() {
                   <StarsRating rating={productData.rating}/>
                   <p className="visually-hidden">Рейтинг: {productData.rating}</p>
                   <p className="rate__count">
-                    <span className="visually-hidden">Всего оценок:</span>{productData.reviewCount}
+                    <span className="visually-hidden">Всего оценок:</span>{reviewsData.length}
                   </p>
                 </div>
                 <p className="product__price">
