@@ -30,7 +30,7 @@ describe('Component: ReviewForm', () => {
 
     expect(screen.getByTestId('submit')).toBeDisabled();
 
-    const starButton = screen.getByTestId('star');
+    const starButton = screen.getByDisplayValue('5');
 
     await userEvent.click(starButton);
     await userEvent.type(screen.getByTestId('userName'), 'keks');

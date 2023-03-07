@@ -36,3 +36,5 @@ export const REVIEW_COMMENT_MIN_LENGTH = 5;
 export const MAIN_CONTENT_POSITION = 500;
 
 export const UNAUTHORIZED_STATUS_CODE = 401;
+
+export const Rating = ['Ужасно', 'Плохо', 'Нормально', 'Хорошо', 'Отлично'] as const;

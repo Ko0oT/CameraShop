@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { FormControllableInput, FormUncontrollableInput, Review as ReviewType } from '../../types/types';
 import { useForm } from 'react-hook-form';
 import { createAPI } from '../../services/api';
-import { APIRoute, MAX_STARS_RATING, REVIEW_COMMENT_MIN_LENGTH, USEFORM_MODE } from '../../constants';
+import { APIRoute, MAX_STARS_RATING, Rating, REVIEW_COMMENT_MIN_LENGTH, USEFORM_MODE } from '../../constants';
 
 type ReviewFormProps = {
   handleReviewsChange: (newReview: ReviewType) => void;
@@ -54,6 +54,27 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
     }
   };
 
+  const makeStar = (it: number) => (
+    <>
+      <input
+        checked={Number(formData.rating) === it}
+        onChange={handleFieldChange}
+        name={'rating'}
+        required
+        className="visually-hidden"
+        id={`star-${it}`}
+        type="radio"
+        defaultValue={it}
+        disabled={isFormDisabled}
+        data-testid="star"
+      />
+      <label
+        className="rate__label"
+        htmlFor={`star-${it}`}
+        title={Rating[it - 1]}
+      />
+    </>);
+
   return (
     <div className="form-review">
       <form
@@ -70,87 +91,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
             </legend>
             <div className="rate__bar">
               <div className="rate__group">
-                <input
-                  checked={Number(formData.rating) === 5}
-                  onChange={handleFieldChange}
-                  name={'rating'}
-                  required
-                  className="visually-hidden"
-                  id="star-5"
-                  type="radio"
-                  defaultValue={5}
-                  disabled={isFormDisabled}
-                  data-testid="star"
-                />
-                <label
-                  className="rate__label"
-                  htmlFor="star-5"
-                  title="Отлично"
-                />
-                <input
-                  checked={Number(formData.rating) === 4}
-                  onChange={handleFieldChange}
-                  name={'rating'}
-                  required
-                  className="visually-hidden"
-                  id="star-4"
-                  type="radio"
-                  defaultValue={4}
-                  disabled={isFormDisabled}
-                />
-                <label
-                  className="rate__label"
-                  htmlFor="star-4"
-                  title="Хорошо"
-                />
-                <input
-                  checked={Number(formData.rating) === 3}
-                  onChange={handleFieldChange}
-                  name={'rating'}
-                  required
-                  className="visually-hidden"
-                  id="star-3"
-                  type="radio"
-                  defaultValue={3}
-                  disabled={isFormDisabled}
-                />
-                <label
-                  className="rate__label"
-                  htmlFor="star-3"
-                  title="Нормально"
-                />
-                <input
-                  checked={Number(formData.rating) === 2}
-                  onChange={handleFieldChange}
-                  name={'rating'}
-                  required
-                  className="visually-hidden"
-                  id="star-2"
-                  type="radio"
-                  defaultValue={2}
-                  disabled={isFormDisabled}
-                />
-                <label
-                  className="rate__label"
-                  htmlFor="star-2"
-                  title="Плохо"
-                />
-                <input
-                  checked={Number(formData.rating) === 1}
-                  onChange={handleFieldChange}
-                  name={'rating'}
-                  required
-                  className="visually-hidden"
-                  id="star-1"
-                  type="radio"
-                  defaultValue={1}
-                  disabled={isFormDisabled}
-                />
-                <label
-                  className="rate__label"
-                  htmlFor="star-1"
-                  title="Ужасно"
-                />
+                {[5, 4, 3, 2, 1].map((it) => makeStar(it))}
               </div>
               <div className="rate__progress">
                 <span className="rate__stars">{formData.rating}</span> <span>/</span>{' '}
