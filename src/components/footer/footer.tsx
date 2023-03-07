@@ -1,20 +1,44 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../constants';
+import { useAppDispatch } from '../../hooks';
+import { resetPage } from '../../store/app-process/app-process-slice';
+import { scrollToContent } from '../../utils/utils';
 
 function Footer() {
+  const dispatch = useAppDispatch();
+
+  const handleLinkClick = () => {
+    scrollToContent();
+    dispatch(resetPage());
+  };
+
+
+  const {pathname} = useLocation();
+
+  const isRoot = pathname === AppRoute.Root;
+
   return (
     <footer className="footer" data-testid="footer">
       <div className="container">
         <div className="footer__info">
-          <Link
-            className="footer__logo"
-            to={AppRoute.Root}
-            aria-label="Переход на главную"
-          >
-            <svg width={100} height={36} aria-hidden="true">
-              <use xlinkHref="#icon-logo-mono" />
-            </svg>
-          </Link>
+          {isRoot
+            ?
+            <span className="footer__logo">
+              <svg width={100} height={36} aria-hidden="true">
+                <use xlinkHref="#icon-logo-mono" />
+              </svg>
+            </span>
+            :
+            <Link
+              className="footer__logo"
+              to={AppRoute.Root}
+              aria-label="Переход на главную"
+              onClick={handleLinkClick}
+            >
+              <svg width={100} height={36} aria-hidden="true">
+                <use xlinkHref="#icon-logo-mono" />
+              </svg>
+            </Link>}
           <p className="footer__description">
       Интернет-магазин фото- и видеотехники
           </p>
@@ -59,8 +83,12 @@ function Footer() {
             <p className="footer__title">Навигация</p>
             <ul className="footer__list">
               <li className="footer__item">
-                <Link className="link" to={AppRoute.Root}>
-            Каталог
+                <Link
+                  className="link"
+                  to={AppRoute.Root}
+                  onClick={handleLinkClick}
+                >
+                Каталог
                 </Link>
               </li>
               <li className="footer__item">

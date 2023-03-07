@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { AppRoute, MAIN_CONTENT_POSITION } from '../../constants';
+import { AppRoute } from '../../constants';
+import { scrollToContent, scrollToTop } from '../../utils/utils';
 
 function ScrollToTop() {
   const {pathname} = useLocation();
@@ -8,20 +9,12 @@ function ScrollToTop() {
   useEffect(() => {
 
     if (/[0-9]/.test(pathname.charAt(1))) {
-      window.scrollTo({
-        top: MAIN_CONTENT_POSITION,
-        left: 0,
-        behavior: 'smooth',
-      });
+      scrollToContent();
       return;
     }
 
     if (pathname.includes(AppRoute.Characteristics) || pathname.includes(AppRoute.Description)) {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'smooth',
-      });
+      scrollToTop();
       return;
     }
 

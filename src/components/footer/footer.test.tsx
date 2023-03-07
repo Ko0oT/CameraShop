@@ -1,13 +1,22 @@
+import { configureMockStore } from '@jedmao/redux-mock-store';
 import {render, screen} from '@testing-library/react';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import Footer from './footer';
 
+const mockStore = configureMockStore();
 describe('Component: LoadingScreen', () => {
   test('should render correctly', () => {
+    const store = mockStore({
+      APP: {currentPage: 1,}
+    });
+
     render(
-      <BrowserRouter>
-        <Footer />
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <Footer />
+        </BrowserRouter>
+      </Provider>
     );
 
     expect(screen.getByText(/Интернет-магазин фото- и видеотехники/i)).toBeInTheDocument();

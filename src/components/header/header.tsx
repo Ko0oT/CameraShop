@@ -1,24 +1,48 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../constants';
+import { useAppDispatch } from '../../hooks';
+import { resetPage } from '../../store/app-process/app-process-slice';
 
 function Header() {
+  const dispatch = useAppDispatch();
+
+  const handleLinkClick = () => {
+    dispatch(resetPage());
+  };
+
+  const {pathname} = useLocation();
+
+  const isRoot = pathname === AppRoute.Root;
+
   return (
     <header className="header" id="header" data-testid="header">
       <div className="container">
-        <Link
-          className="header__logo"
-          to={AppRoute.Root}
-          aria-label="Переход на главную"
-        >
-          <svg width={100} height={36} aria-hidden="true">
-            <use xlinkHref="#icon-logo" />
-          </svg>
-        </Link>
+        {isRoot
+          ?
+          <span className="header__logo">
+            <svg width={100} height={36} aria-hidden="true">
+              <use xlinkHref="#icon-logo" />
+            </svg>
+          </span>
+          :
+          <Link
+            className="header__logo"
+            to={AppRoute.Root}
+            aria-label="Переход на главную"
+          >
+            <svg width={100} height={36} aria-hidden="true">
+              <use xlinkHref="#icon-logo" />
+            </svg>
+          </Link>}
         <nav className="main-nav header__main-nav">
           <ul className="main-nav__list">
             <li className="main-nav__item">
-              <Link className="main-nav__link" to={AppRoute.Root}>
-          Каталог
+              <Link
+                className="main-nav__link"
+                to={AppRoute.Root}
+                onClick={handleLinkClick}
+              >
+              Каталог
               </Link>
             </li>
             <li className="main-nav__item">

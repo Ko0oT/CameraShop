@@ -1,13 +1,22 @@
+import { configureMockStore } from '@jedmao/redux-mock-store';
 import {render, screen} from '@testing-library/react';
+import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import Header from './header';
 
+const mockStore = configureMockStore();
 describe('Component: LoadingScreen', () => {
   test('should render correctly', () => {
+    const store = mockStore({
+      APP: {currentPage: 1,}
+    });
+
     render(
-      <BrowserRouter>
-        <Header />
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <Header />
+        </BrowserRouter>
+      </Provider>
     );
 
     expect(screen.getByText(/Каталог/i)).toBeInTheDocument();
