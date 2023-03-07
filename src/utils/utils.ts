@@ -1,4 +1,4 @@
-import { MAIN_CONTENT_POSITION } from "../constants";
+import { MAIN_CONTENT_POSITION } from '../constants';
 
 export const getPageNumbers = (pagesCount: number): number[] => {
   const numbers = [];

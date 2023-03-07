@@ -1,4 +1,4 @@
-import { useMemo, useState, ChangeEvent } from 'react';
+import React, { useMemo, useState, ChangeEvent } from 'react';
 import { useParams } from 'react-router-dom';
 import { FormControllableInput, FormUncontrollableInput, Review as ReviewType } from '../../types/types';
 import { useForm } from 'react-hook-form';
@@ -55,7 +55,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
   };
 
   const makeStar = (it: number) => (
-    <>
+    <React.Fragment key={it}>
       <input
         checked={Number(formData.rating) === it}
         onChange={handleFieldChange}
@@ -73,7 +73,7 @@ function ReviewForm({handleReviewsChange}: ReviewFormProps) {
         htmlFor={`star-${it}`}
         title={Rating[it - 1]}
       />
-    </>);
+    </React.Fragment>);
 
   return (
     <div className="form-review">
