@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../constants';
-import { useAppDispatch } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { getCameras } from '../../store/app-data/app-data-selectors';
 import { resetPage } from '../../store/app-process/app-process-slice';
 
 function Header() {
@@ -13,6 +15,11 @@ function Header() {
   const {pathname} = useLocation();
 
   const isRoot = pathname === AppRoute.Root;
+
+
+  const cameras = useAppSelector(getCameras);
+  const [formInputValue, setFormInputValue] = useState<string>('');
+  const foundCameras = formInputValue ? cameras.filter((camera) => camera.name.toLowerCase().includes(formInputValue.toLowerCase())) : [];
 
   return (
     <header className="header" id="header" data-testid="header">
@@ -62,7 +69,7 @@ function Header() {
             </li>
           </ul>
         </nav>
-        <div className="form-search">
+        <div className={`form-search ${foundCameras.length ? 'list-opened' : ''}`}>
           <form>
             <label>
               <svg
@@ -78,27 +85,24 @@ function Header() {
                 type="text"
                 autoComplete="off"
                 placeholder="Поиск по сайту"
+                onChange={(evt) => setFormInputValue(evt.target.value)}
+                value={formInputValue}
               />
             </label>
             <ul className="form-search__select-list">
-              <li className="form-search__select-item" tabIndex={0}>
-          Cannonball Pro MX 8i
-              </li>
-              <li className="form-search__select-item" tabIndex={0}>
-          Cannonball Pro MX 7i
-              </li>
-              <li className="form-search__select-item" tabIndex={0}>
-          Cannonball Pro MX 6i
-              </li>
-              <li className="form-search__select-item" tabIndex={0}>
-          Cannonball Pro MX 5i
-              </li>
-              <li className="form-search__select-item" tabIndex={0}>
-          Cannonball Pro MX 4i
-              </li>
+              {foundCameras.map((it) => (
+                <li className="form-search__select-item" tabIndex={0} key={it.id} onClick={() => setFormInputValue('')}>
+                  <Link to={`${AppRoute.Product}/${it.id}`} tabIndex={-1}>
+                    {it.name}
+                  </Link>
+                </li>))}
             </ul>
           </form>
-          <button className="form-search__reset" type="reset">
+          <button
+            className="form-search__reset"
+            type="reset"
+            onClick={() => setFormInputValue('')}
+          >
             <svg width={10} height={10} aria-hidden="true">
               <use xlinkHref="#icon-close" />
             </svg>
