@@ -1,8 +1,11 @@
+import { SortDirection, SortType } from '../constants';
 import { store } from '../store';
 import { Product, Promo } from './types';
 
 export type AppProcess = {
   currentPage: number;
+  currentSortType: SortType;
+  currentSortDirection: SortDirection;
 };
 
 export type AppData = {

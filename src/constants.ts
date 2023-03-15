@@ -19,6 +19,17 @@ export const NameSpace = {
   Data: 'DATA'
 } as const;
 
+export enum SortType {
+  Default = 'default',
+  Rating = 'rating',
+  Price = 'price',
+}
+
+export enum SortDirection {
+  Ascending ='ascending',
+  Descending = 'descending'
+}
+
 export const PRODUCTS_PER_PAGE = 9;
 
 export const PRODUCTS_PER_SLIDER = 3;

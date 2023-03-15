@@ -2,13 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import Banner from '../../components/banner/banner';
 import Pagination from '../../components/pagination/pagination';
 import ProductCard from '../../components/product-card/product-card';
-import { AppRoute, PRODUCTS_PER_PAGE } from '../../constants';
+import { AppRoute, PRODUCTS_PER_PAGE, SortDirection, SortType } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getCurrentPage } from '../../store/app-process/app-process-selectors';
+import { getCurrentPage, getCurrentSortDirection, getCurrentSortType } from '../../store/app-process/app-process-selectors';
 import { Product } from '../../types/types';
-import { resetPage, setCurrentPage } from '../../store/app-process/app-process-slice';
+import { resetPage, setCurrentPage, setCurrentSortDirection, setCurrentSortType } from '../../store/app-process/app-process-slice';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPageNumbers } from '../../utils/utils';
+import { getPageNumbers, sortCameras } from '../../utils/utils';
 import { Helmet } from 'react-helmet-async';
 import ProductPreview from '../../components/product-preview/product-preview';
 import { getCameras } from '../../store/app-data/app-data-selectors';
@@ -16,12 +16,45 @@ import { getCameras } from '../../store/app-data/app-data-selectors';
 function Catalog() {
 
   const cameras = useAppSelector(getCameras);
+  const currentSortType = useAppSelector(getCurrentSortType);
+  const currentSortDirection = useAppSelector(getCurrentSortDirection);
+  const currentPage = useAppSelector(getCurrentPage);
+
+  const [sortedCameras, setSortedCameras] = useState<Product[]>(cameras);
+
+  useEffect(() => {
+    const sortedCams = sortCameras(cameras, currentSortType, currentSortDirection);
+    setSortedCameras(sortedCams);
+  }, [cameras, currentSortType, currentSortDirection]);
+
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
 
-  const {pageId} = useParams();
+  const {pageId, sortType, sortDirection} = useParams();
+
+  useEffect(() => {
+    if(sortType && sortType === SortType.Price) {
+      dispatch(setCurrentSortType(SortType.Price));
+    }
+
+    if(sortType && sortType === SortType.Rating) {
+      dispatch(setCurrentSortType(SortType.Rating));
+    }
+
+    if(sortType && sortType === SortType.Default) {
+      dispatch(setCurrentSortType(SortType.Default));
+    }
+
+    if(sortDirection && sortDirection === SortDirection.Ascending) {
+      dispatch(setCurrentSortDirection(SortDirection.Ascending));
+    }
+
+    if(sortDirection && sortDirection === SortDirection.Descending) {
+      dispatch(setCurrentSortDirection(SortDirection.Descending));
+    }
+  }, [sortType, sortDirection, dispatch]);
 
   const pagesCount = Math.ceil(cameras?.length / PRODUCTS_PER_PAGE);
   const pageNumbers: number[] = useMemo(() => getPageNumbers(pagesCount), [pagesCount]);
@@ -37,10 +70,9 @@ function Catalog() {
   }, [pageId, pageNumbers, navigate, dispatch]);
 
 
-  const currentPage = useAppSelector(getCurrentPage);
   const lastProductIndex = currentPage * PRODUCTS_PER_PAGE;
   const firstProductIndex = lastProductIndex - PRODUCTS_PER_PAGE;
-  const currentProducts = cameras.slice(firstProductIndex, lastProductIndex);
+  const currentProducts = sortedCameras.slice(firstProductIndex, lastProductIndex);
 
 
   const [modalIsActive, setModalActive] = useState<boolean>(false);
@@ -224,12 +256,25 @@ function Catalog() {
                             type="radio"
                             id="sortPrice"
                             name="sort"
-                            defaultChecked
+                            checked={currentSortType === SortType.Price}
+                            onChange={() => {
+                              dispatch(setCurrentSortType(SortType.Price));
+                              navigate(`${AppRoute.Root}${currentPage}/${SortType.Price}/${currentSortDirection}`);
+                            }}
                           />
                           <label htmlFor="sortPrice">по цене</label>
                         </div>
                         <div className="catalog-sort__btn-text">
-                          <input type="radio" id="sortPopular" name="sort" />
+                          <input
+                            type="radio"
+                            id="sortPopular"
+                            name="sort"
+                            checked={currentSortType === SortType.Rating}
+                            onChange={() => {
+                              dispatch(setCurrentSortType(SortType.Rating));
+                              navigate(`${AppRoute.Root}${currentPage}/${SortType.Rating}/${currentSortDirection}`);
+                            }}
+                          />
                           <label htmlFor="sortPopular">по популярности</label>
                         </div>
                       </div>
@@ -239,8 +284,12 @@ function Catalog() {
                             type="radio"
                             id="up"
                             name="sort-icon"
-                            defaultChecked
+                            checked={currentSortDirection === SortDirection.Ascending}
                             aria-label="По возрастанию"
+                            onChange={() => {
+                              dispatch(setCurrentSortDirection(SortDirection.Ascending));
+                              navigate(`${AppRoute.Root}${currentPage}/${currentSortType}/${SortDirection.Ascending}`);
+                            }}
                           />
                           <label htmlFor="up">
                             <svg width={16} height={14} aria-hidden="true">
@@ -254,6 +303,14 @@ function Catalog() {
                             id="down"
                             name="sort-icon"
                             aria-label="По убыванию"
+                            checked={currentSortDirection === SortDirection.Descending}
+                            onChange={() => {
+                              if(currentSortType === SortType.Default) {
+                                dispatch(setCurrentSortType(SortType.Price));
+                              }
+                              dispatch(setCurrentSortDirection(SortDirection.Descending));
+                              navigate(`${AppRoute.Root}${currentPage}/${currentSortType === SortType.Default ? SortType.Price : currentSortType}/${SortDirection.Descending}`);
+                            }}
                           />
                           <label htmlFor="down">
                             <svg width={16} height={14} aria-hidden="true">
