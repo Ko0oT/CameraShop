@@ -1,3 +1,5 @@
+import { CameraCategory, CameraLevel, CameraType } from '../constants';
+
 export type Promo = {
   id: number;
   name: string;
@@ -47,3 +49,9 @@ export type ReviewPost = {
 export type FormUncontrollableInput = Omit<ReviewPost, 'cameraId' | 'rating'>;
 
 export type FormControllableInput = Pick<ReviewPost, 'cameraId' | 'rating'>;
+
+export type Filter = {
+  category: CameraCategory[];
+  type: CameraType[];
+  level: CameraLevel[];
+}

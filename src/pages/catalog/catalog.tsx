@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, ChangeEvent } from 'react';
 import Banner from '../../components/banner/banner';
 import Pagination from '../../components/pagination/pagination';
 import ProductCard from '../../components/product-card/product-card';
-import { AppRoute, PRODUCTS_PER_PAGE, SortDirection, SortType } from '../../constants';
+import { AppRoute, CameraCategory, CameraFilterFields, CameraLevel, CameraType, PRODUCTS_PER_PAGE, SortDirection, SortType } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getCurrentPage, getCurrentSortDirection, getCurrentSortType } from '../../store/app-process/app-process-selectors';
-import { Product } from '../../types/types';
+import { Filter, Product } from '../../types/types';
 import { resetPage, setCurrentPage, setCurrentSortDirection, setCurrentSortType } from '../../store/app-process/app-process-slice';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { getPageNumbers, sortCameras } from '../../utils/utils';
 import { Helmet } from 'react-helmet-async';
 import ProductPreview from '../../components/product-preview/product-preview';
@@ -15,10 +15,49 @@ import { getCameras } from '../../store/app-data/app-data-selectors';
 
 function Catalog() {
 
-  const cameras = useAppSelector(getCameras);
+  // const [searchParams, setSearchParams] = useSearchParams();
+
+  // const postQuery = searchParams.get('type') || '';
+  // eslint-disable-next-line no-console
+  // console.log(postQuery);
+
+
+  const allCameras = useAppSelector(getCameras);
+
+  const currentPage = useAppSelector(getCurrentPage);
   const currentSortType = useAppSelector(getCurrentSortType);
   const currentSortDirection = useAppSelector(getCurrentSortDirection);
-  const currentPage = useAppSelector(getCurrentPage);
+
+
+  const initialFilterState: Filter = {
+    [CameraFilterFields.Category]: [],
+    [CameraFilterFields.Type]: [],
+    [CameraFilterFields.Level]: [],
+  };
+
+  const [filter, setFilter] = useState(initialFilterState);
+
+  function filterCameras(array: Product[], filters: Filter) {
+
+    const keys = Object.keys(filters).filter((key) => Object.prototype.hasOwnProperty.call(filters, key)).filter((it) => filters[it as keyof Filter].length > 0);
+
+    return array.filter((elem) => {
+      const commonKeys = keys.filter((key) => Object.prototype.hasOwnProperty.call(elem, key));
+
+      return commonKeys.reduce((flag, key) => (flag && filters[key as keyof Filter].includes(elem[key as never])), true);
+    });
+  }
+
+  useEffect(() => {
+    const filteredCameras = filterCameras(allCameras, filter);
+
+    // dispatch(setCurrentPage(1));
+    setCameras(filteredCameras);
+  }, [filter]);
+
+
+  const [cameras, setCameras] = useState(allCameras);
+
 
   const [sortedCameras, setSortedCameras] = useState<Product[]>(cameras);
 
@@ -87,6 +126,30 @@ function Catalog() {
     setModalActive(false);
   };
 
+  function handleFilterChange({target: {name, id}}: ChangeEvent<HTMLInputElement>) {
+    // console.log(name);
+
+    if(id === CameraFilterFields.Category) {
+      const currentIndex = filter.category.indexOf(name as CameraCategory);
+      if(currentIndex === -1) {
+        setFilter((prev) => ({...prev, category: [name as CameraCategory]}));
+      } else {
+        setFilter((prev) => ({...prev, category: []}));
+      }
+      return;
+    }
+
+    const currentIndex = filter[id as keyof Filter].indexOf(name as never);
+    const newChecked = [...filter[id as keyof Filter]];
+
+    if(currentIndex === -1) {
+      newChecked.push(name as never);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+    setFilter((prev) => ({...prev, [id]: newChecked}));
+  }
+
 
   return (
     <>
@@ -147,7 +210,10 @@ function Catalog() {
                         <label>
                           <input
                             type="checkbox"
-                            name="photocamera"
+                            name={CameraCategory.Photo}
+                            id={CameraFilterFields.Category}
+                            checked={filter.category.includes(CameraCategory.Photo)}
+                            onChange={handleFilterChange}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
@@ -157,7 +223,14 @@ function Catalog() {
                       </div>
                       <div className="custom-checkbox catalog-filter__item">
                         <label>
-                          <input type="checkbox" name="videocamera" />
+                          <input
+                            type="checkbox"
+                            name={CameraCategory.Video}
+                            id={CameraFilterFields.Category}
+                            checked={filter.category.includes(CameraCategory.Video)}
+                            onChange={handleFilterChange}
+                            disabled={filter.type.includes(CameraType.Film) || filter.type.includes(CameraType.Snapshot)}
+                          />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
                           Видеокамера
@@ -171,7 +244,9 @@ function Catalog() {
                         <label>
                           <input
                             type="checkbox"
-                            name="digital"
+                            name={CameraType.Digital}
+                            id={CameraFilterFields.Type}
+                            onChange={handleFilterChange}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">Цифровая</span>
@@ -179,7 +254,13 @@ function Catalog() {
                       </div>
                       <div className="custom-checkbox catalog-filter__item">
                         <label>
-                          <input type="checkbox" name="film" />
+                          <input
+                            type="checkbox"
+                            name={CameraType.Film}
+                            id={CameraFilterFields.Type}
+                            onChange={handleFilterChange}
+                            disabled={filter.category.includes(CameraCategory.Video)}
+                          />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
                           Плёночная
@@ -188,7 +269,13 @@ function Catalog() {
                       </div>
                       <div className="custom-checkbox catalog-filter__item">
                         <label>
-                          <input type="checkbox" name="snapshot" />
+                          <input
+                            type="checkbox"
+                            name={CameraType.Snapshot}
+                            id={CameraFilterFields.Type}
+                            onChange={handleFilterChange}
+                            disabled={filter.category.includes(CameraCategory.Video)}
+                          />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
                           Моментальная
@@ -199,7 +286,9 @@ function Catalog() {
                         <label>
                           <input
                             type="checkbox"
-                            name="collection"
+                            name={CameraType.Collection}
+                            id={CameraFilterFields.Type}
+                            onChange={handleFilterChange}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
@@ -212,14 +301,24 @@ function Catalog() {
                       <legend className="title title--h5">Уровень</legend>
                       <div className="custom-checkbox catalog-filter__item">
                         <label>
-                          <input type="checkbox" name="zero" />
+                          <input
+                            type="checkbox"
+                            name={CameraLevel.Zero}
+                            id={CameraFilterFields.Level}
+                            onChange={handleFilterChange}
+                          />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">Нулевой</span>
                         </label>
                       </div>
                       <div className="custom-checkbox catalog-filter__item">
                         <label>
-                          <input type="checkbox" name="non-professional" />
+                          <input
+                            type="checkbox"
+                            name={CameraLevel.Amateur}
+                            id={CameraFilterFields.Level}
+                            onChange={handleFilterChange}
+                          />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
                           Любительский
@@ -228,7 +327,12 @@ function Catalog() {
                       </div>
                       <div className="custom-checkbox catalog-filter__item">
                         <label>
-                          <input type="checkbox" name="professional" />
+                          <input
+                            type="checkbox"
+                            name={CameraLevel.Professional}
+                            id={CameraFilterFields.Level}
+                            onChange={handleFilterChange}
+                          />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
                           Профессиональный
@@ -239,6 +343,7 @@ function Catalog() {
                     <button
                       className="btn catalog-filter__reset-btn"
                       type="reset"
+                      onClick={() => setFilter(initialFilterState)}
                     >
                     Сбросить фильтры
                     </button>

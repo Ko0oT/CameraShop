@@ -30,6 +30,30 @@ export enum SortDirection {
   Descending = 'descending'
 }
 
+export enum CameraCategory {
+  Video ='Видеокамера',
+  Photo = 'Фотоаппарат'
+}
+
+export enum CameraType {
+  Digital = 'Цифровая',
+  Film = 'Плёночная',
+  Snapshot = 'Моментальная',
+  Collection ='Коллекционная',
+}
+
+export enum CameraLevel {
+  Zero = 'Нулевой',
+  Amateur = 'Любительский',
+  Professional = 'Профессиональный',
+}
+
+export enum CameraFilterFields {
+  Category = 'category',
+  Type = 'type',
+  Level = 'level',
+}
+
 export const PRODUCTS_PER_PAGE = 9;
 
 export const PRODUCTS_PER_SLIDER = 3;
