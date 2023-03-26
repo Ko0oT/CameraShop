@@ -27,7 +27,6 @@ function App(): JSX.Element {
       <Routes>
         <Route path={AppRoute.Root} element={<Layout/>}>
           <Route index element={<Catalog/>}/>
-          <Route path={`${AppRoute.Root}/:pageId/:sortType/:sortDirection`} element={<Catalog/>}/>
           <Route path={`${AppRoute.Product}/:id`} element={<Product/>}>
             <Route path={AppRoute.Description} element={<Product/>}/>
             <Route path={AppRoute.Characteristics} element={<Product/>}/>

@@ -26,6 +26,7 @@ export enum SortType {
 }
 
 export enum SortDirection {
+  Default = 'default',
   Ascending ='ascending',
   Descending = 'descending'
 }

@@ -4,114 +4,77 @@ import Pagination from '../../components/pagination/pagination';
 import ProductCard from '../../components/product-card/product-card';
 import { AppRoute, CameraCategory, CameraFilterFields, CameraLevel, CameraType, PRODUCTS_PER_PAGE, SortDirection, SortType } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getCurrentPage, getCurrentSortDirection, getCurrentSortType } from '../../store/app-process/app-process-selectors';
+import { getCurrentPage } from '../../store/app-process/app-process-selectors';
 import { Filter, Product } from '../../types/types';
-import { resetPage, setCurrentPage, setCurrentSortDirection, setCurrentSortType } from '../../store/app-process/app-process-slice';
-import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { getPageNumbers, sortCameras } from '../../utils/utils';
+import { resetPage, setCurrentPage } from '../../store/app-process/app-process-slice';
+import { Link, useSearchParams } from 'react-router-dom';
+import { filterCameras, getPageNumbers, sortCameras } from '../../utils/utils';
 import { Helmet } from 'react-helmet-async';
 import ProductPreview from '../../components/product-preview/product-preview';
 import { getCameras } from '../../store/app-data/app-data-selectors';
 
 function Catalog() {
 
-  // const [searchParams, setSearchParams] = useSearchParams();
+  const dispatch = useAppDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // const postQuery = searchParams.get('type') || '';
-  // eslint-disable-next-line no-console
-  // console.log(postQuery);
+  useEffect(() => {
+    const filterQuery = searchParams.get('filter') || '';
+    const sortTypeQuery = searchParams.get('sortType') || '';
+    const sortDirectionQuery = searchParams.get('sortDirection') || '';
+    const pageIdQuery = searchParams.get('pageId') || '';
+
+    if(filterQuery) {
+      setFilter(JSON.parse(filterQuery) as Filter);
+    }
+    if(sortTypeQuery) {
+      setSortType(sortTypeQuery as SortType);
+    }
+    if(sortDirectionQuery) {
+      setSortDirection(sortDirectionQuery as SortDirection);
+    }
+    if(pageIdQuery) {
+      dispatch(setCurrentPage(Number(pageIdQuery)));
+    }
+
+  }, []);
 
 
   const allCameras = useAppSelector(getCameras);
 
   const currentPage = useAppSelector(getCurrentPage);
-  const currentSortType = useAppSelector(getCurrentSortType);
-  const currentSortDirection = useAppSelector(getCurrentSortDirection);
-
-
+  const [sortType, setSortType] = useState(SortType.Default);
+  const [sortDirection, setSortDirection] = useState(SortDirection.Default);
   const initialFilterState: Filter = {
     [CameraFilterFields.Category]: [],
     [CameraFilterFields.Type]: [],
     [CameraFilterFields.Level]: [],
   };
-
   const [filter, setFilter] = useState(initialFilterState);
-
-  function filterCameras(array: Product[], filters: Filter) {
-
-    const keys = Object.keys(filters).filter((key) => Object.prototype.hasOwnProperty.call(filters, key)).filter((it) => filters[it as keyof Filter].length > 0);
-
-    return array.filter((elem) => {
-      const commonKeys = keys.filter((key) => Object.prototype.hasOwnProperty.call(elem, key));
-
-      return commonKeys.reduce((flag, key) => (flag && filters[key as keyof Filter].includes(elem[key as never])), true);
-    });
-  }
-
-  useEffect(() => {
-    const filteredCameras = filterCameras(allCameras, filter);
-
-    // dispatch(setCurrentPage(1));
-    setCameras(filteredCameras);
-  }, [filter]);
-
 
   const [cameras, setCameras] = useState(allCameras);
 
 
-  const [sortedCameras, setSortedCameras] = useState<Product[]>(cameras);
-
   useEffect(() => {
-    const sortedCams = sortCameras(cameras, currentSortType, currentSortDirection);
-    setSortedCameras(sortedCams);
-  }, [cameras, currentSortType, currentSortDirection]);
+    const filteredCameras = filterCameras(allCameras, filter);
+    const sortedCams = sortCameras(filteredCameras, sortType, sortDirection);
 
+    setSearchParams({sortType: sortType, sortDirection: sortDirection, filter: JSON.stringify(filter), pageId: String(currentPage)});
 
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-
-
-  const {pageId, sortType, sortDirection} = useParams();
-
-  useEffect(() => {
-    if(sortType && sortType === SortType.Price) {
-      dispatch(setCurrentSortType(SortType.Price));
+    if(JSON.stringify(filter) !== searchParams.get('filter')) {
+      dispatch(setCurrentPage(1));
     }
 
-    if(sortType && sortType === SortType.Rating) {
-      dispatch(setCurrentSortType(SortType.Rating));
-    }
+    setCameras(sortedCams);
+  }, [sortType, sortDirection, filter, currentPage]);
 
-    if(sortType && sortType === SortType.Default) {
-      dispatch(setCurrentSortType(SortType.Default));
-    }
-
-    if(sortDirection && sortDirection === SortDirection.Ascending) {
-      dispatch(setCurrentSortDirection(SortDirection.Ascending));
-    }
-
-    if(sortDirection && sortDirection === SortDirection.Descending) {
-      dispatch(setCurrentSortDirection(SortDirection.Descending));
-    }
-  }, [sortType, sortDirection, dispatch]);
 
   const pagesCount = Math.ceil(cameras?.length / PRODUCTS_PER_PAGE);
   const pageNumbers: number[] = useMemo(() => getPageNumbers(pagesCount), [pagesCount]);
 
-  useEffect(() => {
-    if (pageId && pageNumbers.includes(Number(pageId))) {
-      dispatch(setCurrentPage(Number(pageId)));
-    }
-
-    if (pageId && !pageNumbers.includes(Number(pageId))) {
-      navigate(AppRoute.NotFound);
-    }
-  }, [pageId, pageNumbers, navigate, dispatch]);
-
-
   const lastProductIndex = currentPage * PRODUCTS_PER_PAGE;
   const firstProductIndex = lastProductIndex - PRODUCTS_PER_PAGE;
-  const currentProducts = sortedCameras.slice(firstProductIndex, lastProductIndex);
+  const currentProducts = cameras.slice(firstProductIndex, lastProductIndex);
 
 
   const [modalIsActive, setModalActive] = useState<boolean>(false);
@@ -127,7 +90,6 @@ function Catalog() {
   };
 
   function handleFilterChange({target: {name, id}}: ChangeEvent<HTMLInputElement>) {
-    // console.log(name);
 
     if(id === CameraFilterFields.Category) {
       const currentIndex = filter.category.indexOf(name as CameraCategory);
@@ -247,6 +209,7 @@ function Catalog() {
                             name={CameraType.Digital}
                             id={CameraFilterFields.Type}
                             onChange={handleFilterChange}
+                            checked={filter.type.includes(CameraType.Digital)}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">Цифровая</span>
@@ -260,6 +223,7 @@ function Catalog() {
                             id={CameraFilterFields.Type}
                             onChange={handleFilterChange}
                             disabled={filter.category.includes(CameraCategory.Video)}
+                            checked={filter.type.includes(CameraType.Film)}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
@@ -275,6 +239,7 @@ function Catalog() {
                             id={CameraFilterFields.Type}
                             onChange={handleFilterChange}
                             disabled={filter.category.includes(CameraCategory.Video)}
+                            checked={filter.type.includes(CameraType.Snapshot)}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
@@ -289,6 +254,7 @@ function Catalog() {
                             name={CameraType.Collection}
                             id={CameraFilterFields.Type}
                             onChange={handleFilterChange}
+                            checked={filter.type.includes(CameraType.Collection)}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
@@ -306,6 +272,7 @@ function Catalog() {
                             name={CameraLevel.Zero}
                             id={CameraFilterFields.Level}
                             onChange={handleFilterChange}
+                            checked={filter.level.includes(CameraLevel.Zero)}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">Нулевой</span>
@@ -318,6 +285,7 @@ function Catalog() {
                             name={CameraLevel.Amateur}
                             id={CameraFilterFields.Level}
                             onChange={handleFilterChange}
+                            checked={filter.level.includes(CameraLevel.Amateur)}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
@@ -332,6 +300,7 @@ function Catalog() {
                             name={CameraLevel.Professional}
                             id={CameraFilterFields.Level}
                             onChange={handleFilterChange}
+                            checked={filter.level.includes(CameraLevel.Professional)}
                           />
                           <span className="custom-checkbox__icon" />
                           <span className="custom-checkbox__label">
@@ -361,10 +330,12 @@ function Catalog() {
                             type="radio"
                             id="sortPrice"
                             name="sort"
-                            checked={currentSortType === SortType.Price}
+                            checked={sortType === SortType.Price}
                             onChange={() => {
-                              dispatch(setCurrentSortType(SortType.Price));
-                              navigate(`${AppRoute.Root}${currentPage}/${SortType.Price}/${currentSortDirection}`);
+                              if(sortDirection === SortDirection.Default) {
+                                setSortDirection(SortDirection.Ascending);
+                              }
+                              setSortType(SortType.Price);
                             }}
                           />
                           <label htmlFor="sortPrice">по цене</label>
@@ -374,10 +345,12 @@ function Catalog() {
                             type="radio"
                             id="sortPopular"
                             name="sort"
-                            checked={currentSortType === SortType.Rating}
+                            checked={sortType === SortType.Rating}
                             onChange={() => {
-                              dispatch(setCurrentSortType(SortType.Rating));
-                              navigate(`${AppRoute.Root}${currentPage}/${SortType.Rating}/${currentSortDirection}`);
+                              if(sortDirection === SortDirection.Default) {
+                                setSortDirection(SortDirection.Ascending);
+                              }
+                              setSortType(SortType.Rating);
                             }}
                           />
                           <label htmlFor="sortPopular">по популярности</label>
@@ -389,11 +362,13 @@ function Catalog() {
                             type="radio"
                             id="up"
                             name="sort-icon"
-                            checked={currentSortDirection === SortDirection.Ascending}
+                            checked={sortDirection === SortDirection.Ascending}
                             aria-label="По возрастанию"
                             onChange={() => {
-                              dispatch(setCurrentSortDirection(SortDirection.Ascending));
-                              navigate(`${AppRoute.Root}${currentPage}/${currentSortType}/${SortDirection.Ascending}`);
+                              if(sortType === SortType.Default) {
+                                setSortType(SortType.Price);
+                              }
+                              setSortDirection(SortDirection.Ascending);
                             }}
                           />
                           <label htmlFor="up">
@@ -408,13 +383,12 @@ function Catalog() {
                             id="down"
                             name="sort-icon"
                             aria-label="По убыванию"
-                            checked={currentSortDirection === SortDirection.Descending}
+                            checked={sortDirection === SortDirection.Descending}
                             onChange={() => {
-                              if(currentSortType === SortType.Default) {
-                                dispatch(setCurrentSortType(SortType.Price));
+                              if(sortType === SortType.Default) {
+                                setSortType(SortType.Price);
                               }
-                              dispatch(setCurrentSortDirection(SortDirection.Descending));
-                              navigate(`${AppRoute.Root}${currentPage}/${currentSortType === SortType.Default ? SortType.Price : currentSortType}/${SortDirection.Descending}`);
+                              setSortDirection(SortDirection.Descending);
                             }}
                           />
                           <label htmlFor="down">

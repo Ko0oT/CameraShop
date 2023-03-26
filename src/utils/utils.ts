@@ -1,5 +1,5 @@
 import { MAIN_CONTENT_POSITION, SortDirection, SortType } from '../constants';
-import { Product } from '../types/types';
+import { Filter, Product } from '../types/types';
 
 export const getPageNumbers = (pagesCount: number): number[] => {
   const numbers = [];
@@ -44,6 +44,9 @@ export const sortCameras = (cameras: Product[], sortType: SortType, sortDirectio
   let sortedCamerasBySortDirection;
 
   switch (sortDirection) {
+    case SortDirection.Default:
+      sortedCamerasBySortDirection = defaultCameras;
+      break;
     case SortDirection.Ascending:
       sortedCamerasBySortDirection = sortedCamerasBySortType;
       break;
@@ -53,4 +56,15 @@ export const sortCameras = (cameras: Product[], sortType: SortType, sortDirectio
   }
 
   return sortedCamerasBySortDirection;
+};
+
+export const filterCameras = (array: Product[], filters: Filter) => {
+
+  const keys = Object.keys(filters).filter((key) => Object.prototype.hasOwnProperty.call(filters, key)).filter((it) => filters[it as keyof Filter].length > 0);
+
+  return array.filter((elem) => {
+    const commonKeys = keys.filter((key) => Object.prototype.hasOwnProperty.call(elem, key));
+
+    return commonKeys.reduce((flag, key) => (flag && filters[key as keyof Filter].includes(elem[key as never])), true);
+  });
 };
