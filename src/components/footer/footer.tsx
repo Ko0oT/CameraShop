@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../constants';
 import { useAppDispatch } from '../../hooks';
-import { resetPage } from '../../store/app-process/app-process-slice';
+import { setNeedToUpdate } from '../../store/app-process/app-process-slice';
 import { scrollToContent } from '../../utils/utils';
 
 function Footer() {
@@ -9,7 +9,7 @@ function Footer() {
 
   const handleLinkClick = () => {
     scrollToContent();
-    dispatch(resetPage());
+    dispatch(setNeedToUpdate(true));
   };
 
 

@@ -3,6 +3,7 @@ import { Product, Promo } from './types';
 
 export type AppProcess = {
   currentPage: number;
+  isNeedToUpdate: boolean;
 };
 
 export type AppData = {

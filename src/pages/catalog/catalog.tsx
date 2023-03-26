@@ -4,11 +4,11 @@ import Pagination from '../../components/pagination/pagination';
 import ProductCard from '../../components/product-card/product-card';
 import { AppRoute, CameraCategory, CameraFilterFields, CameraLevel, CameraType, PRODUCTS_PER_PAGE, SortDirection, SortType } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getCurrentPage } from '../../store/app-process/app-process-selectors';
+import { getCurrentPage, getIsNeedToUpdate } from '../../store/app-process/app-process-selectors';
 import { Filter, Price, Product } from '../../types/types';
-import { resetPage, setCurrentPage } from '../../store/app-process/app-process-slice';
+import { setCurrentPage, setNeedToUpdate } from '../../store/app-process/app-process-slice';
 import { Link, useSearchParams } from 'react-router-dom';
-import { filterCamerasByOtherOptions, filterCamerasByPrice, getPageNumbers, sortCameras } from '../../utils/utils';
+import { filterCamerasByOtherOptions, filterCamerasByPrice, findMinAndMaxPrice, getPageNumbers, sortCameras } from '../../utils/utils';
 import { Helmet } from 'react-helmet-async';
 import ProductPreview from '../../components/product-preview/product-preview';
 import { getCameras } from '../../store/app-data/app-data-selectors';
@@ -49,16 +49,11 @@ function Catalog() {
   const currentPage = useAppSelector(getCurrentPage);
   const [sortType, setSortType] = useState(SortType.Default);
   const [sortDirection, setSortDirection] = useState(SortDirection.Default);
-
-  const minCatalogPrice = 1990;
-  const maxCatalogPrice = 199000;
-
   const initialPriceState: Price = {
     minPrice: '',
     maxPrice: '',
   };
   const [price, setPrice] = useState(initialPriceState);
-
   const initialFilterState: Filter = {
     [CameraFilterFields.Category]: [],
     [CameraFilterFields.Type]: [],
@@ -66,7 +61,22 @@ function Catalog() {
   };
   const [filter, setFilter] = useState(initialFilterState);
 
+
   const [cameras, setCameras] = useState(allCameras);
+
+  const isNeedToUpdate = useAppSelector(getIsNeedToUpdate);
+
+  const [minCatalogPrice, maxCatalogPrice] = useMemo(() => findMinAndMaxPrice(allCameras), [allCameras]);
+
+  useEffect(() => {
+    if(isNeedToUpdate) {
+      setSortType(SortType.Default);
+      setSortDirection(SortDirection.Default);
+      setPrice(initialPriceState);
+      setFilter(initialFilterState);
+      dispatch(setNeedToUpdate(false));
+    }
+  }, [isNeedToUpdate]);
 
 
   useEffect(() => {
@@ -139,7 +149,13 @@ function Catalog() {
           <div className="container">
             <ul className="breadcrumbs__list">
               <li className="breadcrumbs__item">
-                <Link className="breadcrumbs__link" to={AppRoute.Root} onClick={() => dispatch(resetPage())}>
+                <Link
+                  className="breadcrumbs__link"
+                  to={AppRoute.Root}
+                  onClick={() => {
+                    dispatch(setNeedToUpdate(true));
+                  }}
+                >
                 Главная
                   <svg width={5} height={8} aria-hidden="true">
                     <use xlinkHref="#icon-arrow-mini" />
@@ -160,7 +176,7 @@ function Catalog() {
             <div className="page-content__columns">
               <div className="catalog__aside">
                 <div className="catalog-filter">
-                  <form action="#">
+                  <form action="#" autoComplete='off'>
                     <h2 className="visually-hidden">Фильтр</h2>
                     <fieldset className="catalog-filter__block">
                       <legend className="title title--h5">Цена, ₽</legend>
@@ -170,7 +186,7 @@ function Catalog() {
                             <input
                               type="number"
                               name="price"
-                              placeholder={`от ${minCatalogPrice}`}
+                              placeholder={String(minCatalogPrice)}
                               onChange={(evt) => {
                                 if (Number(evt.target.value) === 0) {
                                   setPrice((prev) => ({...prev, minPrice: ''}));
@@ -475,7 +491,7 @@ function Catalog() {
                     <Pagination pagesCount={pagesCount} pageNumbers={pageNumbers}/>
                   </>
                   :
-                  <p style={{fontSize: 30, marginTop: 50}}>Нет подходящих товаров</p>}
+                  <p style={{fontSize: 30, marginTop: 50}}>По вашему запросу ничего не найдено</p>}
               </div>
             </div>
           </div>

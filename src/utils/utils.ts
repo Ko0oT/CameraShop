@@ -79,3 +79,10 @@ export const filterCamerasByPrice = (array: Product[], price: Price) => {
   }
   return result;
 };
+
+export const findMinAndMaxPrice = (array: Product[]) => {
+  const defaultCameras = [...array];
+  const sortedCamerasByPrice = defaultCameras.sort((a, b) => a.price - b.price);
+  return [sortedCamerasByPrice[0].price, sortedCamerasByPrice[sortedCamerasByPrice.length - 1].price];
+};
+

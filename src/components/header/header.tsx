@@ -3,13 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getCameras } from '../../store/app-data/app-data-selectors';
-import { resetPage } from '../../store/app-process/app-process-slice';
+import { setNeedToUpdate } from '../../store/app-process/app-process-slice';
 
 function Header() {
   const dispatch = useAppDispatch();
 
   const handleLinkClick = () => {
-    dispatch(resetPage());
+    dispatch(setNeedToUpdate(true));
   };
 
   const {pathname} = useLocation();
