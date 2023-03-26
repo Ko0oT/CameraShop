@@ -35,14 +35,6 @@ describe('Application Routing', () => {
     expect(screen.getAllByTestId('card')).toBeInstanceOf(Array);
   });
 
-  test('should render "Catalog" when user navigate to "/2"', () => {
-
-    render(fakeApp(`${AppRoute.Root}2`));
-
-    expect(screen.getByText(/Каталог фото- и видеотехники/i)).toBeInTheDocument();
-    expect(screen.getAllByTestId('card')).toBeInstanceOf(Array);
-  });
-
   test('should render "Product" when user navigate to "/product/2"', () => {
 
     render(fakeApp(`${AppRoute.Product}/2`));

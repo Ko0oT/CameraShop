@@ -46,7 +46,7 @@ describe('Component: Catalog', () => {
       </Provider>
     );
 
-    expect(screen.getByText(/Нет подходящих товаров/i)).toBeInTheDocument();
+    expect(screen.getByText(/По вашему запросу ничего не найдено/i)).toBeInTheDocument();
     expect(screen.queryByTestId('card')).not.toBeInTheDocument();
     expect(screen.queryByText(/Далее/i)).not.toBeInTheDocument();
   });

@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { AppRoute } from '../../constants';
 import { Provider } from 'react-redux';
 import { configureMockStore } from '@jedmao/redux-mock-store';
+import { makeFakeCameras, makeFakePromo } from '../../utils/mocks';
 
 const mockStore = configureMockStore();
 
@@ -11,6 +12,7 @@ describe('Component: Layout', () => {
 
   test('should render correctly', () => {
     const store = mockStore({
+      DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
       APP: {currentPage: 1,}
     });
 

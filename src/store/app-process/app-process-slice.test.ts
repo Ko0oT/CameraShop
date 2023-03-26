@@ -3,7 +3,7 @@ import { appProcess, setCurrentPage, setNeedToUpdate } from './app-process-slice
 describe('Reducer: appProcess', () => {
   test('without additional parameters should return initial state', () => {
     expect(appProcess.reducer(undefined, {type: 'UNKNOWN_ACTION'}))
-      .toEqual({currentPage: 1});
+      .toEqual({currentPage: 1, isNeedToUpdate: false});
   });
 
   test('should set current page to a given value', () => {
