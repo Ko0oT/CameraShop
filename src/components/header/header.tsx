@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, KeyboardEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -20,6 +20,23 @@ function Header() {
   const cameras = useAppSelector(getCameras);
   const [formInputValue, setFormInputValue] = useState<string>('');
   const foundCameras = formInputValue ? cameras.filter((camera) => camera.name.toLowerCase().includes(formInputValue.toLowerCase())) : [];
+
+
+  const handleKeyDown = (evt: KeyboardEvent) => {
+    const target = evt.target as HTMLLIElement;
+    if(evt.code === 'ArrowDown' && target.nextElementSibling) {
+      const previous = target.nextElementSibling as HTMLLIElement;
+      previous.focus();
+    }
+    if(evt.code === 'ArrowUp' && target.previousElementSibling) {
+      const next = target.previousElementSibling as HTMLLIElement;
+      next.focus();
+    }
+    if(evt.code === 'Space' && target.firstChild) {
+      const link = target.firstChild as HTMLAnchorElement;
+      link.click();
+    }
+  };
 
   return (
     <header className="header" id="header" data-testid="header">
@@ -89,10 +106,18 @@ function Header() {
                 value={formInputValue}
               />
             </label>
-            <ul className="form-search__select-list">
+            <ul className="form-search__select-list" onKeyDown={handleKeyDown}>
               {foundCameras.map((it) => (
-                <li className="form-search__select-item" tabIndex={0} key={it.id} onClick={() => setFormInputValue('')}>
-                  <Link to={`${AppRoute.Product}/${it.id}`} tabIndex={-1}>
+                <li
+                  className="form-search__select-item"
+                  tabIndex={0}
+                  key={it.id}
+                  onClick={() => setFormInputValue('')}
+                >
+                  <Link
+                    to={`${AppRoute.Product}/${it.id}`}
+                    tabIndex={-1}
+                  >
                     {it.name}
                   </Link>
                 </li>))}
