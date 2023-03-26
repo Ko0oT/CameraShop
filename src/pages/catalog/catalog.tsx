@@ -5,10 +5,10 @@ import ProductCard from '../../components/product-card/product-card';
 import { AppRoute, CameraCategory, CameraFilterFields, CameraLevel, CameraType, PRODUCTS_PER_PAGE, SortDirection, SortType } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { getCurrentPage } from '../../store/app-process/app-process-selectors';
-import { Filter, Product } from '../../types/types';
+import { Filter, Price, Product } from '../../types/types';
 import { resetPage, setCurrentPage } from '../../store/app-process/app-process-slice';
 import { Link, useSearchParams } from 'react-router-dom';
-import { filterCameras, getPageNumbers, sortCameras } from '../../utils/utils';
+import { filterCamerasByOtherOptions, filterCamerasByPrice, getPageNumbers, sortCameras } from '../../utils/utils';
 import { Helmet } from 'react-helmet-async';
 import ProductPreview from '../../components/product-preview/product-preview';
 import { getCameras } from '../../store/app-data/app-data-selectors';
@@ -19,11 +19,15 @@ function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
+    const priceQuery = searchParams.get('price') || '';
     const filterQuery = searchParams.get('filter') || '';
     const sortTypeQuery = searchParams.get('sortType') || '';
     const sortDirectionQuery = searchParams.get('sortDirection') || '';
     const pageIdQuery = searchParams.get('pageId') || '';
 
+    if(priceQuery) {
+      setPrice(JSON.parse(priceQuery) as Price);
+    }
     if(filterQuery) {
       setFilter(JSON.parse(filterQuery) as Filter);
     }
@@ -45,6 +49,16 @@ function Catalog() {
   const currentPage = useAppSelector(getCurrentPage);
   const [sortType, setSortType] = useState(SortType.Default);
   const [sortDirection, setSortDirection] = useState(SortDirection.Default);
+
+  const minCatalogPrice = 1990;
+  const maxCatalogPrice = 199000;
+
+  const initialPriceState: Price = {
+    minPrice: '',
+    maxPrice: '',
+  };
+  const [price, setPrice] = useState(initialPriceState);
+
   const initialFilterState: Filter = {
     [CameraFilterFields.Category]: [],
     [CameraFilterFields.Type]: [],
@@ -56,17 +70,18 @@ function Catalog() {
 
 
   useEffect(() => {
-    const filteredCameras = filterCameras(allCameras, filter);
+    const filteredCamerasByPrice = filterCamerasByPrice(allCameras, price);
+    const filteredCameras = filterCamerasByOtherOptions(filteredCamerasByPrice, filter);
     const sortedCams = sortCameras(filteredCameras, sortType, sortDirection);
 
-    setSearchParams({sortType: sortType, sortDirection: sortDirection, filter: JSON.stringify(filter), pageId: String(currentPage)});
+    setSearchParams({sortType: sortType, sortDirection: sortDirection, price: JSON.stringify(price), filter: JSON.stringify(filter), pageId: String(currentPage)});
 
-    if(JSON.stringify(filter) !== searchParams.get('filter')) {
+    if(JSON.stringify(filter) !== searchParams.get('filter') || JSON.stringify(price) !== searchParams.get('price')) {
       dispatch(setCurrentPage(1));
     }
 
     setCameras(sortedCams);
-  }, [sortType, sortDirection, filter, currentPage]);
+  }, [sortType, sortDirection, filter, price, currentPage]);
 
 
   const pagesCount = Math.ceil(cameras?.length / PRODUCTS_PER_PAGE);
@@ -152,7 +167,32 @@ function Catalog() {
                       <div className="catalog-filter__price-range">
                         <div className="custom-input">
                           <label>
-                            <input type="number" name="price" placeholder="от" />
+                            <input
+                              type="number"
+                              name="price"
+                              placeholder={`от ${minCatalogPrice}`}
+                              onChange={(evt) => {
+                                if (Number(evt.target.value) === 0) {
+                                  setPrice((prev) => ({...prev, minPrice: ''}));
+                                  return;
+                                }
+                                setPrice((prev) => ({...prev, minPrice: Number(evt.target.value)}));
+                              }}
+                              onBlur={(evt) => {
+                                if (Number(evt.target.value) < minCatalogPrice && price.minPrice !== '') {
+                                  setPrice((prev) => ({...prev, minPrice: minCatalogPrice}));
+                                }
+                                if (price.maxPrice && Number(evt.target.value) > price.maxPrice) {
+                                  setPrice((prev) => ({...prev, minPrice: prev.maxPrice}));
+                                  return;
+                                }
+                                if (Number(evt.target.value) > maxCatalogPrice) {
+                                  setPrice((prev) => ({...prev, minPrice: maxCatalogPrice}));
+                                }
+                              }}
+                              value={price.minPrice}
+                              min={0}
+                            />
                           </label>
                         </div>
                         <div className="custom-input">
@@ -160,7 +200,29 @@ function Catalog() {
                             <input
                               type="number"
                               name="priceUp"
-                              placeholder="до"
+                              placeholder={String(maxCatalogPrice)}
+                              onChange={(evt) => {
+                                if (Number(evt.target.value) === 0) {
+                                  setPrice((prev) => ({...prev, maxPrice: ''}));
+                                  return;
+                                }
+                                setPrice((prev) => ({...prev, maxPrice: Number(evt.target.value)}));
+                              }}
+                              onBlur={(evt) => {
+                                if (Number(evt.target.value) > maxCatalogPrice) {
+                                  setPrice((prev) => ({...prev, maxPrice: maxCatalogPrice}));
+                                  return;
+                                }
+                                if (price.minPrice && Number(evt.target.value) < price.minPrice && price.maxPrice !== '') {
+                                  setPrice((prev) => ({...prev, maxPrice: prev.minPrice}));
+                                  return;
+                                }
+                                if (Number(evt.target.value) < minCatalogPrice && price.maxPrice !== '') {
+                                  setPrice((prev) => ({...prev, maxPrice: minCatalogPrice}));
+                                }
+                              }}
+                              value={price.maxPrice}
+                              min={0}
                             />
                           </label>
                         </div>
@@ -312,7 +374,10 @@ function Catalog() {
                     <button
                       className="btn catalog-filter__reset-btn"
                       type="reset"
-                      onClick={() => setFilter(initialFilterState)}
+                      onClick={() => {
+                        setFilter(initialFilterState);
+                        setPrice(initialPriceState);
+                      }}
                     >
                     Сбросить фильтры
                     </button>

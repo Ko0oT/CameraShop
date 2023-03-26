@@ -1,5 +1,5 @@
 import { MAIN_CONTENT_POSITION, SortDirection, SortType } from '../constants';
-import { Filter, Product } from '../types/types';
+import { Filter, Price, Product } from '../types/types';
 
 export const getPageNumbers = (pagesCount: number): number[] => {
   const numbers = [];
@@ -58,7 +58,7 @@ export const sortCameras = (cameras: Product[], sortType: SortType, sortDirectio
   return sortedCamerasBySortDirection;
 };
 
-export const filterCameras = (array: Product[], filters: Filter) => {
+export const filterCamerasByOtherOptions = (array: Product[], filters: Filter) => {
 
   const keys = Object.keys(filters).filter((key) => Object.prototype.hasOwnProperty.call(filters, key)).filter((it) => filters[it as keyof Filter].length > 0);
 
@@ -67,4 +67,15 @@ export const filterCameras = (array: Product[], filters: Filter) => {
 
     return commonKeys.reduce((flag, key) => (flag && filters[key as keyof Filter].includes(elem[key as never])), true);
   });
+};
+
+export const filterCamerasByPrice = (array: Product[], price: Price) => {
+  let result = array;
+  if(price.minPrice !== '') {
+    result = result.filter((it) => it.price >= price.minPrice);
+  }
+  if(price.maxPrice !== '') {
+    result = result.filter((it) => it.price <= price.maxPrice);
+  }
+  return result;
 };

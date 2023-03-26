@@ -55,3 +55,8 @@ export type Filter = {
   type: CameraType[];
   level: CameraLevel[];
 }
+
+export type Price = {
+  minPrice: number | string;
+  maxPrice: number | string;
+}
