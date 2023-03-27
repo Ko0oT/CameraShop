@@ -28,7 +28,10 @@ function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
           />
         </picture>
       </div>
-      <div className="product-card__info" style={{alignItems: 'stretch', flexDirection: 'column'}}>
+      <div
+        className="product-card__info"
+        style={{alignItems: 'stretch', flexDirection: 'column'}}
+      >
         <div className="rate product-card__rate">
           <StarsRating rating={data.rating}/>
           <p className="visually-hidden">Рейтинг: {data.rating}</p>
