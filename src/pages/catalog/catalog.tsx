@@ -64,9 +64,11 @@ function Catalog() {
 
   const [cameras, setCameras] = useState(allCameras);
 
-  const isNeedToUpdate = useAppSelector(getIsNeedToUpdate);
+  const [filteredCamerasForPlaceholder, setFilteredCamerasForPlaceholder] = useState(allCameras);
 
-  const [minCatalogPrice, maxCatalogPrice] = useMemo(() => findMinAndMaxPrice(allCameras), [allCameras]);
+  const [minCatalogPrice, maxCatalogPrice] = useMemo(() => findMinAndMaxPrice(filteredCamerasForPlaceholder), [filteredCamerasForPlaceholder]);
+
+  const isNeedToUpdate = useAppSelector(getIsNeedToUpdate);
 
   useEffect(() => {
     if(isNeedToUpdate) {
@@ -82,6 +84,11 @@ function Catalog() {
   useEffect(() => {
     const filteredCamerasByPrice = filterCamerasByPrice(allCameras, price);
     const filteredCameras = filterCamerasByOtherOptions(filteredCamerasByPrice, filter);
+
+    if (filteredCameras.length !== 0) {
+      setFilteredCamerasForPlaceholder(filteredCameras);
+    }
+
     const sortedCams = sortCameras(filteredCameras, sortType, sortDirection);
 
     setSearchParams({sortType: sortType, sortDirection: sortDirection, price: JSON.stringify(price), filter: JSON.stringify(filter), pageId: String(currentPage)});
