@@ -30,13 +30,13 @@ function Product() {
   useEffect(() => {
     api.get<ProductType>(`${APIRoute.Cameras}/${id as string}`)
       .then((response) => setProductData(response.data))
-      .catch(() => navigate(AppRoute.NotFound));
+      .catch(() => navigate(AppRoute.NotFound, { replace: true }));
     api.get<ProductType[]>(`${APIRoute.Cameras}/${id as string}/${APIRoute.Similar}`)
       .then((response) => setSimilarData(response.data))
-      .catch(() => navigate(AppRoute.NotFound));
+      .catch(() => navigate(AppRoute.NotFound, { replace: true }));
     api.get<ReviewType[]>(`${APIRoute.Cameras}/${id as string}${APIRoute.Reviews}`)
       .then((response) => setReviewsData(response.data.sort((a, b) => Date.parse(b.createAt) - Date.parse(a.createAt))))
-      .catch(() => navigate(AppRoute.NotFound));
+      .catch(() => navigate(AppRoute.NotFound, { replace: true }));
     return () => {
       setProductData(null);
       setSimilarData(null);
