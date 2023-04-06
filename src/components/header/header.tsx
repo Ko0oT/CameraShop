@@ -32,7 +32,7 @@ function Header() {
       const next = target.previousElementSibling as HTMLLIElement;
       next.focus();
     }
-    if(evt.code === 'Space' && target.firstChild) {
+    if(evt.code === 'Enter' && target.firstChild) {
       const link = target.firstChild as HTMLAnchorElement;
       link.click();
     }
@@ -106,7 +106,7 @@ function Header() {
                 value={formInputValue}
               />
             </label>
-            <ul className="form-search__select-list" onKeyDown={handleKeyDown}>
+            <ul className="form-search__select-list scroller" onKeyDown={handleKeyDown}>
               {foundCameras.map((it) => (
                 <li
                   className="form-search__select-item"
