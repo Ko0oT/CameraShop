@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, ChangeEvent } from 'react';
+import { useEffect, useMemo, useState, useRef, ChangeEvent, KeyboardEvent } from 'react';
 import Banner from '../../components/banner/banner';
 import Pagination from '../../components/pagination/pagination';
 import ProductCard from '../../components/product-card/product-card';
@@ -10,8 +10,11 @@ import { setCurrentPage, setNeedToUpdate } from '../../store/app-process/app-pro
 import { Link, useSearchParams } from 'react-router-dom';
 import { filterCamerasByOtherOptions, filterCamerasByPrice, findMinAndMaxPrice, getPageNumbers, sortCameras } from '../../utils/utils';
 import { Helmet } from 'react-helmet-async';
-import ProductPreview from '../../components/product-preview/product-preview';
 import { getCameras } from '../../store/app-data/app-data-selectors';
+import FocusTrap from 'focus-trap-react';
+import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+import { addCameraInBasket } from '../../store/app-data/app-data-slice';
+
 
 function Catalog() {
 
@@ -110,7 +113,24 @@ function Catalog() {
 
 
   const [modalIsActive, setModalActive] = useState<boolean>(false);
+  const [successModalIsActive, setSuccessModalIsActive] = useState<boolean>(false);
   const [selectedProduct, setSelectedProduct] = useState<Product>({} as Product);
+
+  const modalRef = useRef(null);
+  const successModalRef = useRef(null);
+
+  useEffect(() => {
+    if (modalRef.current) {
+      disableBodyScroll(modalRef.current);
+    } else if (successModalRef.current) {
+      disableBodyScroll(successModalRef.current);
+    } else {
+      clearAllBodyScrollLocks();
+    }
+    return () => {
+      clearAllBodyScrollLocks();
+    };
+  }, [modalIsActive, successModalIsActive]);
 
   const handleBuyButtonClick = (data: Product) => {
     setModalActive(true);
@@ -118,8 +138,26 @@ function Catalog() {
   };
 
   const handleCloseButtonClick = () => {
-    setModalActive(false);
+    if (modalIsActive) {
+      setModalActive(false);
+    }
+    if (successModalIsActive) {
+      setSuccessModalIsActive(false);
+    }
   };
+
+  const handleAddButtonClick = () => {
+    setModalActive(false);
+    dispatch(addCameraInBasket(selectedProduct.id));
+    setSuccessModalIsActive(true);
+  };
+
+  const handleEscKeydown = (evt: KeyboardEvent<HTMLDivElement>) => {
+    if(evt.key === 'Escape') {
+      handleCloseButtonClick();
+    }
+  };
+
 
   function handleFilterChange({target: {name, id}}: ChangeEvent<HTMLInputElement>) {
 
@@ -504,7 +542,121 @@ function Catalog() {
           </div>
         </section>
       </div>
-      <ProductPreview data={selectedProduct} isActive={modalIsActive} handleCloseButtonClick={handleCloseButtonClick}/>
+      {modalIsActive
+        ?
+        <FocusTrap>
+          <div
+            className="modal is-active"
+            ref={modalRef}
+            onKeyDown={handleEscKeydown}
+          >
+            <div className="modal__wrapper">
+              <div className="modal__overlay" onClick={handleCloseButtonClick} data-testid="overlay"/>
+              <div className="modal__content">
+                <p className="title title--h4">Добавить товар в корзину</p>
+                <div className="basket-item basket-item--short">
+                  <div className="basket-item__img">
+                    <picture>
+                      <source
+                        type="image/webp"
+                        srcSet={`${selectedProduct.previewImgWebp}, ${selectedProduct.previewImgWebp2x} 2x`}
+                      />
+                      <img
+                        src={selectedProduct.previewImg}
+                        srcSet={`${selectedProduct.previewImg2x} 2x`}
+                        width={140}
+                        height={120}
+                        alt={selectedProduct.name}
+                      />
+                    </picture>
+                  </div>
+                  <div className="basket-item__description">
+                    <p className="basket-item__title">{selectedProduct.name}</p>
+                    <ul className="basket-item__list">
+                      <li className="basket-item__list-item">
+                        <span className="basket-item__article">Артикул:</span>{' '}
+                        <span className="basket-item__number">{selectedProduct.vendorCode}</span>
+                      </li>
+                      <li className="basket-item__list-item">{selectedProduct.category}</li>
+                      <li className="basket-item__list-item">{selectedProduct.level} уровень</li>
+                    </ul>
+                    <p className="basket-item__price">
+                      <span className="visually-hidden">Цена:</span>{selectedProduct.price} ₽
+                    </p>
+                  </div>
+                </div>
+                <div className="modal__buttons">
+                  <button
+                    className="btn btn--purple modal__btn modal__btn--fit-width"
+                    type="button"
+                    onClick={handleAddButtonClick}
+                  >
+                    <svg width={24} height={16} aria-hidden="true">
+                      <use xlinkHref="#icon-add-basket" />
+                    </svg>
+              Добавить в корзину
+                  </button>
+                </div>
+                <button
+                  className="cross-btn"
+                  type="button"
+                  aria-label="Закрыть попап"
+                  onClick={handleCloseButtonClick}
+                  data-testid="closeButton"
+                >
+                  <svg width={10} height={10} aria-hidden="true">
+                    <use xlinkHref="#icon-close" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </FocusTrap>
+        : ''}
+      {successModalIsActive
+        ?
+        <FocusTrap>
+          <div
+            className="modal is-active modal--narrow"
+            ref={successModalRef}
+            onKeyDown={handleEscKeydown}
+          >
+            <div className="modal__wrapper">
+              <div className="modal__overlay" onClick={handleCloseButtonClick}></div>
+              <div className="modal__content">
+                <p className="title title--h4">Товар успешно добавлен в корзину</p>
+                <svg className="modal__icon" width="86" height="80" aria-hidden="true">
+                  <use xlinkHref="#icon-success"></use>
+                </svg>
+                <div className="modal__buttons">
+                  <button
+                    className="btn btn--transparent modal__btn"
+                    onClick={handleCloseButtonClick}
+                  >
+              Продолжить покупки
+                  </button>
+                  <Link
+                    className="btn btn--purple modal__btn modal__btn--fit-width"
+                    to={AppRoute.Basket}
+                  >
+              Перейти в корзину
+                  </Link>
+                </div>
+                <button
+                  className="cross-btn"
+                  type="button"
+                  aria-label="Закрыть попап"
+                  onClick={handleCloseButtonClick}
+                >
+                  <svg width="10" height="10" aria-hidden="true">
+                    <use xlinkHref="#icon-close"></use>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </FocusTrap>
+        : ''}
     </>
   );
 }

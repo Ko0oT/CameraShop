@@ -9,3 +9,5 @@ export const getPromo = (state: State): Promo => state[NameSpace.Data].promo;
 export const getIsCamerasDataLoading = (state: State): boolean => state[NameSpace.Data].isCamerasDataLoading;
 
 export const getIsPromoDataLoading = (state: State): boolean => state[NameSpace.Data].isPromoDataLoading;
+
+export const getCamerasInBasket = (state: State): number[] => state[NameSpace.Data].camerasInBasket;

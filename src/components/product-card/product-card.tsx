@@ -2,8 +2,8 @@ import { Product } from '../../types/types';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../../constants';
 import StarsRating from '../stars-rating/stars-rating';
-
-const isInTheBasket = false;
+import { useAppSelector } from '../../hooks';
+import { getCamerasInBasket } from '../../store/app-data/app-data-selectors';
 
 type ProductCardProps = {
   data: Product;
@@ -11,6 +11,10 @@ type ProductCardProps = {
 }
 
 function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
+
+  const camerasInBasket = useAppSelector(getCamerasInBasket);
+  const isInTheBasket = camerasInBasket.includes(data.id);
+
   return (
     <div className="product-card" style={{height: '100%', alignItems: 'stretch', flexDirection: 'column'}} data-testid="card">
       <div className="product-card__img">
@@ -49,15 +53,15 @@ function ProductCard({data, handleBuyButtonClick}: ProductCardProps) {
       <div className="product-card__buttons">
         {isInTheBasket
           ?
-          <a
+          <Link
             className="btn btn--purple-border product-card__btn product-card__btn--in-cart"
-            href="#"
+            to={AppRoute.Basket}
           >
             <svg width={16} height={16} aria-hidden="true">
               <use xlinkHref="#icon-basket" />
             </svg>
             В корзине
-          </a>
+          </Link>
           :
           <button
             className="btn btn--purple product-card__btn"

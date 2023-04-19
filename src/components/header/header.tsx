@@ -2,7 +2,7 @@ import { useState, KeyboardEvent } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AppRoute } from '../../constants';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { getCameras } from '../../store/app-data/app-data-selectors';
+import { getCameras, getCamerasInBasket } from '../../store/app-data/app-data-selectors';
 import { setNeedToUpdate } from '../../store/app-process/app-process-slice';
 
 function Header() {
@@ -18,6 +18,7 @@ function Header() {
 
 
   const cameras = useAppSelector(getCameras);
+  const camerasInBasket = useAppSelector(getCamerasInBasket);
   const [formInputValue, setFormInputValue] = useState<string>('');
   const foundCameras = formInputValue ? cameras.filter((camera) => camera.name.toLowerCase().includes(formInputValue.toLowerCase())) : [];
 
@@ -134,12 +135,18 @@ function Header() {
             <span className="visually-hidden">Сбросить поиск</span>
           </button>
         </div>
-        <a className="header__basket-link" href="#">
+        <Link
+          className="header__basket-link"
+          to={AppRoute.Basket}
+        >
           <svg width={16} height={16} aria-hidden="true">
             <use xlinkHref="#icon-basket" />
           </svg>
-          <span className="header__basket-count">3</span>
-        </a>
+          {camerasInBasket.length > 0
+            ?
+            <span className="header__basket-count">{camerasInBasket.length}</span>
+            : ''}
+        </Link>
       </div>
     </header>
   );

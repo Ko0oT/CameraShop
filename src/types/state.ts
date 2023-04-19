@@ -11,6 +11,7 @@ export type AppData = {
   isCamerasDataLoading: boolean;
   promo: Promo;
   isPromoDataLoading: boolean;
+  camerasInBasket: number[];
 }
 
 export type State = ReturnType<typeof store.getState>;

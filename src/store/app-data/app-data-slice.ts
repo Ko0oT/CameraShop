@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NameSpace } from '../../constants';
 import { AppData } from '../../types/state';
 import { Promo } from '../../types/types';
@@ -9,12 +9,20 @@ const initialState: AppData = {
   isCamerasDataLoading: false,
   promo: {} as Promo,
   isPromoDataLoading: false,
+  camerasInBasket: [],
 };
 
 export const appData = createSlice({
   name: NameSpace.Data,
   initialState,
-  reducers: {},
+  reducers: {
+    addCameraInBasket: (state, action: PayloadAction<number>) => {
+      state.camerasInBasket.push(action.payload);
+    },
+    deleteCameraFromBasket: (state, action: PayloadAction<number>) => {
+      state.camerasInBasket = state.camerasInBasket.filter((it) => it !== action.payload);
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(fetchCamerasAction.pending, (state) => {
@@ -34,3 +42,4 @@ export const appData = createSlice({
   }
 });
 
+export const {addCameraInBasket, deleteCameraFromBasket} = appData.actions;

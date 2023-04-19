@@ -16,6 +16,7 @@ describe('Reducer: appData', () => {
         isCamerasDataLoading: false,
         promo: {},
         isPromoDataLoading: false,
+        camerasInBasket: [],
       });
   });
 
@@ -25,6 +26,7 @@ describe('Reducer: appData', () => {
       isCamerasDataLoading: false,
       promo: {} as Promo,
       isPromoDataLoading: false,
+      camerasInBasket: [],
     };
 
     expect(appData.reducer(state, {type: fetchCamerasAction.fulfilled.type, payload: cameras}))
@@ -33,6 +35,7 @@ describe('Reducer: appData', () => {
         isCamerasDataLoading: false,
         promo: {},
         isPromoDataLoading: false,
+        camerasInBasket: [],
       });
   });
 
@@ -42,6 +45,7 @@ describe('Reducer: appData', () => {
       isCamerasDataLoading: false,
       promo: {} as Promo,
       isPromoDataLoading: false,
+      camerasInBasket: [],
     };
 
     expect(appData.reducer(state, {type: fetchPromoAction.fulfilled.type, payload: promo}))
@@ -50,6 +54,7 @@ describe('Reducer: appData', () => {
         isCamerasDataLoading: false,
         promo,
         isPromoDataLoading: false,
+        camerasInBasket: [],
       });
   });
 

@@ -16,12 +16,15 @@ import ReviewForm from '../../components/review-form/review-form';
 import { disableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
 import { createAPI } from '../../services/api';
 import LoadingScreen from '../../components/loading-screen/loading-screen';
+import { addCameraInBasket } from '../../store/app-data/app-data-slice';
+import { useAppDispatch } from '../../hooks';
 
 
 function Product() {
   const api = createAPI();
   const {id} = useParams();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [productData, setProductData] = useState<ProductType | null>(null);
   const [similarData, setSimilarData] = useState<ProductType[] | null>(null);
@@ -79,14 +82,22 @@ function Product() {
 
 
   const [reviewModalIsActive, setReviewModalActive] = useState<boolean>(false);
+  const [successReviewModalIsActive, setSuccessReviewModalIsActive] = useState<boolean>(false);
+  const [modalIsActive, setModalActive] = useState<boolean>(false);
   const [successModalIsActive, setSuccessModalIsActive] = useState<boolean>(false);
 
   const reviewModalRef = useRef(null);
+  const successReviewModalRef = useRef(null);
+  const modalRef = useRef(null);
   const successModalRef = useRef(null);
 
   useEffect(() => {
     if (reviewModalRef.current) {
       disableBodyScroll(reviewModalRef.current);
+    } else if (successReviewModalRef.current) {
+      disableBodyScroll(successReviewModalRef.current);
+    } else if (modalRef.current) {
+      disableBodyScroll(modalRef.current);
     } else if (successModalRef.current) {
       disableBodyScroll(successModalRef.current);
     } else {
@@ -95,35 +106,48 @@ function Product() {
     return () => {
       clearAllBodyScrollLocks();
     };
-  }, [reviewModalIsActive, successModalIsActive]);
+  }, [reviewModalIsActive, successReviewModalIsActive, modalIsActive, successModalIsActive]);
 
-  const closeReviewModal = () => {
-    setReviewModalActive(false);
+  const handleCloseButtonClick = () => {
+    if(reviewModalIsActive) {
+      setReviewModalActive(false);
+    }
+    if(successReviewModalIsActive) {
+      setSuccessReviewModalIsActive(false);
+    }
+    if (modalIsActive) {
+      setModalActive(false);
+    }
+    if (successModalIsActive) {
+      setSuccessModalIsActive(false);
+    }
   };
 
-  const closeSuccessModal = () => {
-    setSuccessModalIsActive(false);
+  const handleBuyButtonClick = () => {
+    setModalActive(true);
+  };
+
+  const handleAddButtonClick = () => {
+    if (productData) {
+      setModalActive(false);
+      dispatch(addCameraInBasket(productData.id));
+      setSuccessModalIsActive(true);
+    }
   };
 
   const handleEscKeydown = (evt: KeyboardEvent<HTMLDivElement>) => {
     if(evt.key === 'Escape') {
-      closeReviewModal();
-      closeSuccessModal();
+      handleCloseButtonClick();
     }
   };
 
   const handleReviewsChange = (newReview: ReviewType): void => {
-    closeReviewModal();
+    setReviewModalActive(false);
     if(reviewsData) {
       setReviewsData([newReview, ...reviewsData]);
     }
-    setSuccessModalIsActive(true);
+    setSuccessReviewModalIsActive(true);
   };
-
-
-  // TODO добавить хендлер кнопки покупки
-  const handleBuyButtonClick = () => null;
-
 
   const [reviewsCount, setReviewsCount] = useState(REVIEWS_COUNT);
   const slicedReviews = reviewsData?.slice(0, reviewsCount);
@@ -207,9 +231,11 @@ function Product() {
                 <p className="product__price">
                   <span className="visually-hidden">Цена:</span>{productData.price} ₽
                 </p>
-
-                {/* TODO добавить хендлер */}
-                <button className="btn btn--purple" type="button">
+                <button
+                  className="btn btn--purple"
+                  type="button"
+                  onClick={handleBuyButtonClick}
+                >
                   <svg width={24} height={16} aria-hidden="true">
                     <use xlinkHref="#icon-add-basket" />
                   </svg>
@@ -369,7 +395,7 @@ function Product() {
             <div className="modal__wrapper">
               <div
                 className="modal__overlay"
-                onClick={closeReviewModal}
+                onClick={handleCloseButtonClick}
               />
               <div className="modal__content">
                 <p className="title title--h4">Оставить отзыв</p>
@@ -378,7 +404,120 @@ function Product() {
                   className="cross-btn"
                   type="button"
                   aria-label="Закрыть попап"
-                  onClick={closeReviewModal}
+                  onClick={handleCloseButtonClick}
+                >
+                  <svg width={10} height={10} aria-hidden="true">
+                    <use xlinkHref="#icon-close" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </FocusTrap>
+        : ''}
+      {successReviewModalIsActive
+        ?
+        <FocusTrap>
+          <div
+            className="modal is-active modal--narrow"
+            onKeyDown={handleEscKeydown}
+            ref={successReviewModalRef}
+          >
+            <div className="modal__wrapper">
+              <div
+                className="modal__overlay"
+                onClick={handleCloseButtonClick}
+              />
+              <div className="modal__content">
+                <p className="title title--h4">Спасибо за отзыв</p>
+                <svg className="modal__icon" width={80} height={78} aria-hidden="true">
+                  <use xlinkHref="#icon-review-success" />
+                </svg>
+                <div className="modal__buttons">
+                  <button
+                    className="btn btn--purple modal__btn modal__btn--fit-width"
+                    type="button"
+                    onClick={handleCloseButtonClick}
+                  >
+                  Вернуться к покупкам
+                  </button>
+                </div>
+                <button
+                  className="cross-btn"
+                  type="button"
+                  aria-label="Закрыть попап"
+                  onClick={handleCloseButtonClick}
+                >
+                  <svg width={10} height={10} aria-hidden="true">
+                    <use xlinkHref="#icon-close" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </FocusTrap>
+        : ''}
+      {modalIsActive
+        ?
+        <FocusTrap>
+          <div
+            className="modal is-active"
+            ref={modalRef}
+            onKeyDown={handleEscKeydown}
+          >
+            <div className="modal__wrapper">
+              <div className="modal__overlay" onClick={handleCloseButtonClick} data-testid="overlay"/>
+              <div className="modal__content">
+                <p className="title title--h4">Добавить товар в корзину</p>
+                <div className="basket-item basket-item--short">
+                  <div className="basket-item__img">
+                    <picture>
+                      <source
+                        type="image/webp"
+                        srcSet={`${productData.previewImgWebp}, ${productData.previewImgWebp2x} 2x`}
+                      />
+                      <img
+                        src={productData.previewImg}
+                        srcSet={`${productData.previewImg2x} 2x`}
+                        width={140}
+                        height={120}
+                        alt={productData.name}
+                      />
+                    </picture>
+                  </div>
+                  <div className="basket-item__description">
+                    <p className="basket-item__title">{productData.name}</p>
+                    <ul className="basket-item__list">
+                      <li className="basket-item__list-item">
+                        <span className="basket-item__article">Артикул:</span>{' '}
+                        <span className="basket-item__number">{productData.vendorCode}</span>
+                      </li>
+                      <li className="basket-item__list-item">{productData.category}</li>
+                      <li className="basket-item__list-item">{productData.level} уровень</li>
+                    </ul>
+                    <p className="basket-item__price">
+                      <span className="visually-hidden">Цена:</span>{productData.price} ₽
+                    </p>
+                  </div>
+                </div>
+                <div className="modal__buttons">
+                  <button
+                    className="btn btn--purple modal__btn modal__btn--fit-width"
+                    type="button"
+                    onClick={handleAddButtonClick}
+                  >
+                    <svg width={24} height={16} aria-hidden="true">
+                      <use xlinkHref="#icon-add-basket" />
+                    </svg>
+              Добавить в корзину
+                  </button>
+                </div>
+                <button
+                  className="cross-btn"
+                  type="button"
+                  aria-label="Закрыть попап"
+                  onClick={handleCloseButtonClick}
+                  data-testid="closeButton"
                 >
                   <svg width={10} height={10} aria-hidden="true">
                     <use xlinkHref="#icon-close" />
@@ -394,36 +533,38 @@ function Product() {
         <FocusTrap>
           <div
             className="modal is-active modal--narrow"
-            onKeyDown={handleEscKeydown}
             ref={successModalRef}
+            onKeyDown={handleEscKeydown}
           >
             <div className="modal__wrapper">
-              <div
-                className="modal__overlay"
-                onClick={closeSuccessModal}
-              />
+              <div className="modal__overlay" onClick={handleCloseButtonClick}></div>
               <div className="modal__content">
-                <p className="title title--h4">Спасибо за отзыв</p>
-                <svg className="modal__icon" width={80} height={78} aria-hidden="true">
-                  <use xlinkHref="#icon-review-success" />
+                <p className="title title--h4">Товар успешно добавлен в корзину</p>
+                <svg className="modal__icon" width="86" height="80" aria-hidden="true">
+                  <use xlinkHref="#icon-success"></use>
                 </svg>
                 <div className="modal__buttons">
-                  <button
-                    className="btn btn--purple modal__btn modal__btn--fit-width"
-                    type="button"
-                    onClick={closeSuccessModal}
+                  <Link
+                    className="btn btn--transparent modal__btn"
+                    to={AppRoute.Root}
                   >
-                  Вернуться к покупкам
-                  </button>
+              Продолжить покупки
+                  </Link>
+                  <Link
+                    className="btn btn--purple modal__btn modal__btn--fit-width"
+                    to={AppRoute.Basket}
+                  >
+              Перейти в корзину
+                  </Link>
                 </div>
                 <button
                   className="cross-btn"
                   type="button"
                   aria-label="Закрыть попап"
-                  onClick={closeSuccessModal}
+                  onClick={handleCloseButtonClick}
                 >
-                  <svg width={10} height={10} aria-hidden="true">
-                    <use xlinkHref="#icon-close" />
+                  <svg width="10" height="10" aria-hidden="true">
+                    <use xlinkHref="#icon-close"></use>
                   </svg>
                 </button>
               </div>
