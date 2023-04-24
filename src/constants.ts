@@ -12,6 +12,8 @@ export const APIRoute = {
   Similar: 'similar',
   Reviews: '/reviews',
   Promo: '/promo',
+  Coupons: '/coupons',
+  Order: '/orders'
 } as const;
 
 export const NameSpace = {
@@ -74,3 +76,7 @@ export const MAIN_CONTENT_POSITION = 500;
 export const UNAUTHORIZED_STATUS_CODE = 401;
 
 export const Rating = ['Ужасно', 'Плохо', 'Нормально', 'Хорошо', 'Отлично'] as const;
+
+export const MIN_PRODUCT_QUANTITY_IN_BASKET = 1;
+
+export const MAX_PRODUCT_QUANTITY_IN_BASKET = 99;

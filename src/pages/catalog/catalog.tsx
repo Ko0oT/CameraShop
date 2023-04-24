@@ -577,7 +577,7 @@ function Catalog() {
                         <span className="basket-item__article">Артикул:</span>{' '}
                         <span className="basket-item__number">{selectedProduct.vendorCode}</span>
                       </li>
-                      <li className="basket-item__list-item">{selectedProduct.category}</li>
+                      <li className="basket-item__list-item">{selectedProduct.type} {selectedProduct.category === CameraCategory.Photo ? 'фотокамера' : selectedProduct.category.toLowerCase()}</li>
                       <li className="basket-item__list-item">{selectedProduct.level} уровень</li>
                     </ul>
                     <p className="basket-item__price">
