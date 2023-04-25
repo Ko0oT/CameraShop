@@ -8,6 +8,8 @@ import { makeFakeCamera, makeFakeCameras, makeFakeReviews } from '../../utils/mo
 import Product from './product';
 import 'intersection-observer';
 import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
+import { configureMockStore } from '@jedmao/redux-mock-store';
 
 const api = createAPI();
 const mockAPI = new MockAdapter(api, { onNoMatch: 'throwException' });
@@ -18,6 +20,7 @@ beforeAll(() => {
 
 afterEach(cleanup);
 
+const mockStore = configureMockStore();
 describe('Component: Product', () => {
   test('should render correctly while fetching data', async () => {
     mockAPI
@@ -30,15 +33,21 @@ describe('Component: Product', () => {
       .onGet(`${APIRoute.Cameras}/1${APIRoute.Reviews}`)
       .reply(200, makeFakeReviews(3));
 
+    const store = mockStore({
+      DATA: {camerasInBasket: [1, 2, 3],}
+    });
+
     render(
-      <HelmetProvider>
-        <MemoryRouter initialEntries={[`${AppRoute.Product}/1`]}>
-          <Routes>
-            <Route path={`${AppRoute.Product}/:id`} element={<Product />}>
-            </Route>
-          </Routes>
-        </MemoryRouter>
-      </HelmetProvider>
+      <Provider store={store}>
+        <HelmetProvider>
+          <MemoryRouter initialEntries={[`${AppRoute.Product}/1`]}>
+            <Routes>
+              <Route path={`${AppRoute.Product}/:id`} element={<Product />}>
+              </Route>
+            </Routes>
+          </MemoryRouter>
+        </HelmetProvider>
+      </Provider>
     );
 
     expect(screen.getByText(/Загрузка/i)).toBeInTheDocument();
@@ -58,17 +67,23 @@ describe('Component: Product', () => {
       .onGet(`${APIRoute.Cameras}/1${APIRoute.Reviews}`)
       .reply(200, makeFakeReviews(3));
 
+    const store = mockStore({
+      DATA: {camerasInBasket: [1, 2, 3],}
+    });
+
     render(
-      <HelmetProvider>
-        <MemoryRouter initialEntries={[`${AppRoute.Product}/1/${AppRoute.Characteristics}`]}>
-          <Routes>
-            <Route path={`${AppRoute.Product}/:id`} element={<Product />}>
-              <Route path={AppRoute.Description} element={<Product/>}/>
-              <Route path={AppRoute.Characteristics} element={<Product/>}/>
-            </Route>
-          </Routes>
-        </MemoryRouter>
-      </HelmetProvider>
+      <Provider store={store}>
+        <HelmetProvider>
+          <MemoryRouter initialEntries={[`${AppRoute.Product}/1/${AppRoute.Characteristics}`]}>
+            <Routes>
+              <Route path={`${AppRoute.Product}/:id`} element={<Product />}>
+                <Route path={AppRoute.Description} element={<Product/>}/>
+                <Route path={AppRoute.Characteristics} element={<Product/>}/>
+              </Route>
+            </Routes>
+          </MemoryRouter>
+        </HelmetProvider>
+      </Provider>
     );
 
     expect(screen.getByText(/Загрузка/i)).toBeInTheDocument();
@@ -88,15 +103,21 @@ describe('Component: Product', () => {
       .onGet(`${APIRoute.Cameras}/1${APIRoute.Reviews}`)
       .reply(200, makeFakeReviews(3));
 
+    const store = mockStore({
+      DATA: {camerasInBasket: [1, 2, 3],}
+    });
+
     render(
-      <HelmetProvider>
-        <MemoryRouter initialEntries={[`${AppRoute.Product}/1`]}>
-          <Routes>
-            <Route path={`${AppRoute.Product}/:id`} element={<Product />}>
-            </Route>
-          </Routes>
-        </MemoryRouter>
-      </HelmetProvider>
+      <Provider store={store}>
+        <HelmetProvider>
+          <MemoryRouter initialEntries={[`${AppRoute.Product}/1`]}>
+            <Routes>
+              <Route path={`${AppRoute.Product}/:id`} element={<Product />}>
+              </Route>
+            </Routes>
+          </MemoryRouter>
+        </HelmetProvider>
+      </Provider>
     );
 
     expect(await screen.findByText(/Описание/i)).toBeInTheDocument();

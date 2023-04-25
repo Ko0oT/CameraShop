@@ -12,7 +12,7 @@ const mockStore = configureMockStore();
 describe('Component: Catalog', () => {
   test('should render correctly when cameras is not empty', () => {
     const store = mockStore({
-      DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
+      DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false, camerasInBasket: [1, 2, 3]},
       APP: {currentPage: 1,}
     });
 
@@ -32,7 +32,7 @@ describe('Component: Catalog', () => {
 
   test('should render correctly when cameras is empty', () => {
     const store = mockStore({
-      DATA: {cameras: [], isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
+      DATA: {cameras: [], isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false, camerasInBasket: [1, 2, 3]},
       APP: {currentPage: 1,}
     });
 
@@ -53,7 +53,7 @@ describe('Component: Catalog', () => {
 
   test('should\'t render pagination when cameras less or equal product per page', () => {
     const store = mockStore({
-      DATA: {cameras: makeFakeCameras(PRODUCTS_PER_PAGE), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
+      DATA: {cameras: makeFakeCameras(PRODUCTS_PER_PAGE), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false, camerasInBasket: [1, 2, 3]},
       APP: {currentPage: 1,}
     });
 

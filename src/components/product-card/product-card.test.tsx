@@ -3,7 +3,10 @@ import { BrowserRouter } from 'react-router-dom';
 import { makeFakeCamera } from '../../utils/mocks';
 import userEvent from '@testing-library/user-event';
 import ProductCard from './product-card';
+import { configureMockStore } from '@jedmao/redux-mock-store';
+import { Provider } from 'react-redux';
 
+const mockStore = configureMockStore();
 
 describe('Component: ProductPreview', () => {
 
@@ -11,10 +14,16 @@ describe('Component: ProductPreview', () => {
   test('should render correctly', () => {
     const data = {...makeFakeCamera(), reviewCount: 100500, price: 123123123,};
 
+    const store = mockStore({
+      DATA: {camerasInBasket: [1, 2, 3],}
+    });
+
     render(
-      <BrowserRouter>
-        <ProductCard data={data} handleBuyButtonClick={fakeHandler}/>
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <ProductCard data={data} handleBuyButtonClick={fakeHandler}/>
+        </BrowserRouter>
+      </Provider>
     );
 
     expect(screen.getByText(/100500/i)).toBeInTheDocument();
@@ -24,10 +33,16 @@ describe('Component: ProductPreview', () => {
   test('should invoke handler with buy button click', async () => {
     const data = {...makeFakeCamera(), reviewCount: 100500, price: 123123123,};
 
+    const store = mockStore({
+      DATA: {camerasInBasket: [1, 2, 3],}
+    });
+
     render(
-      <BrowserRouter>
-        <ProductCard data={data} handleBuyButtonClick={fakeHandler}/>
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <ProductCard data={data} handleBuyButtonClick={fakeHandler}/>
+        </BrowserRouter>
+      </Provider>
     );
 
     expect(screen.getByText(/100500/i)).toBeInTheDocument();

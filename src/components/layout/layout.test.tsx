@@ -12,7 +12,7 @@ describe('Component: Layout', () => {
 
   test('should render correctly', () => {
     const store = mockStore({
-      DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
+      DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false, camerasInBasket: [1, 2, 3],},
       APP: {currentPage: 1,}
     });
 

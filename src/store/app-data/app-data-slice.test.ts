@@ -1,7 +1,7 @@
 import { AppData } from '../../types/state';
 import { makeFakeCameras, makeFakePromo } from '../../utils/mocks';
 import { fetchCamerasAction, fetchPromoAction } from '../api-action';
-import { appData } from './app-data-slice';
+import { addCameraInBasket, appData, changeQuantityInBasket, clearBasket, deleteCameraFromBasket } from './app-data-slice';
 import { Product, Promo } from '../../types/types';
 
 
@@ -58,4 +58,79 @@ describe('Reducer: appData', () => {
       });
   });
 
+  test('should add camera in the busket', () => {
+    const state: AppData = {
+      cameras: [] as Product[],
+      isCamerasDataLoading: false,
+      promo: {} as Promo,
+      isPromoDataLoading: false,
+      camerasInBasket: [1, 2, 3, 3],
+    };
+
+    expect(appData.reducer(state, addCameraInBasket(1)))
+      .toEqual({
+        cameras: [] as Product[],
+        isCamerasDataLoading: false,
+        promo: {} as Promo,
+        isPromoDataLoading: false,
+        camerasInBasket: [1, 2, 3, 3, 1],
+      });
+  });
+
+  test('should delete camera from the busket', () => {
+    const state: AppData = {
+      cameras: [] as Product[],
+      isCamerasDataLoading: false,
+      promo: {} as Promo,
+      isPromoDataLoading: false,
+      camerasInBasket: [1, 2, 3, 3],
+    };
+
+    expect(appData.reducer(state, deleteCameraFromBasket(3)))
+      .toEqual({
+        cameras: [] as Product[],
+        isCamerasDataLoading: false,
+        promo: {} as Promo,
+        isPromoDataLoading: false,
+        camerasInBasket: [1, 2],
+      });
+  });
+
+  test('should change quantity of product in the busket', () => {
+    const state: AppData = {
+      cameras: [] as Product[],
+      isCamerasDataLoading: false,
+      promo: {} as Promo,
+      isPromoDataLoading: false,
+      camerasInBasket: [1, 2, 3, 3, 3],
+    };
+
+    expect(appData.reducer(state, changeQuantityInBasket({value: 1, id: 3})))
+      .toEqual({
+        cameras: [] as Product[],
+        isCamerasDataLoading: false,
+        promo: {} as Promo,
+        isPromoDataLoading: false,
+        camerasInBasket: [1, 2, 3],
+      });
+  });
+
+  test('should clear busket', () => {
+    const state: AppData = {
+      cameras: [] as Product[],
+      isCamerasDataLoading: false,
+      promo: {} as Promo,
+      isPromoDataLoading: false,
+      camerasInBasket: [1, 2, 3, 3, 3],
+    };
+
+    expect(appData.reducer(state, clearBasket()))
+      .toEqual({
+        cameras: [] as Product[],
+        isCamerasDataLoading: false,
+        promo: {} as Promo,
+        isPromoDataLoading: false,
+        camerasInBasket: [],
+      });
+  });
 });

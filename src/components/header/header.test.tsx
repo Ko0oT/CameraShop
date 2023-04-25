@@ -9,7 +9,7 @@ const mockStore = configureMockStore();
 describe('Component: LoadingScreen', () => {
   test('should render correctly', () => {
     const store = mockStore({
-      DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false,},
+      DATA: {cameras: makeFakeCameras(30), isCamerasDataLoading: false, promo: makeFakePromo(), isPromoDataLoading: false, camerasInBasket: [1, 2, 3],},
       APP: {currentPage: 1,}
     });
 
@@ -24,5 +24,6 @@ describe('Component: LoadingScreen', () => {
     expect(screen.getByText(/Каталог/i)).toBeInTheDocument();
     expect(screen.getByText(/Гарантии/i)).toBeInTheDocument();
     expect(screen.getByText(/Доставка/i)).toBeInTheDocument();
+    expect(screen.getByText(/3/i)).toBeInTheDocument();
   });
 });
